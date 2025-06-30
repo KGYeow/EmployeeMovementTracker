@@ -1,0 +1,63 @@
+﻿@inherits LayoutComponentBase
+
+@* Required *@
+<MudThemeProvider Theme="MyCustomTheme" />
+<MudPopoverProvider />
+
+@* Needed for dialogs *@
+<MudDialogProvider />
+
+@* Needed for snackbars *@
+<MudSnackbarProvider />
+
+<MudLayout>
+    <!-- Topbar -->
+    <MudAppBar Color="Color.Primary">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <h4 class="mt-4 mb-4 ms-2 fw-bold">Employee Movement Tracker</h4>
+    </MudAppBar>
+
+    <!-- Sidebar -->
+    <MudDrawer Class="py-3" Color="Color.Primary" @bind-Open="@drawerOpen">
+        <NavMenu />
+    </MudDrawer>
+
+    <!-- Main Content -->
+    <MudMainContent Class="min-vh-100">
+        <MudContainer Class="my-6" MaxWidth="MaxWidth.Large">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+
+    <!-- Footer -->
+    <MudAppBar Bottom Fixed="false" Color="Color.Primary" Elevation="0">
+        <MudItem>
+            &copy; @DateTime.Now.Year Jabil Inc.. All rights reserved.
+        </MudItem>
+    </MudAppBar>
+</MudLayout>
+
+@* <div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div> *@
+
+@code {
+    // Variable declaration & initialization
+    bool drawerOpen = true;
+
+    // Toggle the drawer to open/close
+    void DrawerToggle() => drawerOpen = !drawerOpen;
+    
+    // Define custom theme
+    MudTheme MyCustomTheme = new MudTheme()
+    {
+        PaletteLight = new PaletteLight()
+        {
+            Primary = "#003D6B",
+            Secondary = "#3CB4E5",
+            Background = "#F5F5F5",
+        }
+    };
+}
