@@ -1,8 +1,11 @@
 ﻿@page "/"
+
 @using EmpMovementTracker.DTOs
-@using EmpMovementTracker.Services
 @using EmpMovementTracker.Models
+@using EmpMovementTracker.Services
+
 @inject EmployeeMovementService EmployeeMovementService
+@inject EmployeeTimeTrackingService EmployeeTimeTrackingService
 @inject NavigationManager Navigation
 
 <PageTitle>Home</PageTitle>
@@ -33,7 +36,7 @@
     <MudItem xs="12">
         <MudCard Elevation="25">
             <MudCardContent>
-                <EditForm FormName="EmployeeTimeTrackingMovementFilterForm" Model="@filter" OnValidSubmit="ApplyFilter">
+                <EditForm FormName="EmployeeTimeTrackingFilterForm" Model="@filter" OnValidSubmit="ApplyFilter">
                     <MudStack Row Wrap="Wrap.Wrap">
                         <MudItem Class="flex-grow-1">
                             <!-- Employee Name Filter -->
@@ -88,7 +91,9 @@
                         <div class="vr"></div>
                         <MudStack Row>
                             <!-- Add Employee Turnstile Movement Button -->
-                            <MudButton IconClass="me-1" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" Href="/EmployeeMovement/Create">Insert</MudButton>
+                            <MudButton IconClass="me-1" StartIcon="@Icons.Material.Rounded.Add" Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" Href="/EmployeeMovement/Create" title="Add Employee Turnstile Movement">
+                                Insert
+                            </MudButton>
                         </MudStack>
                     </MudStack>
                 </EditForm>
@@ -116,19 +121,36 @@
                     <NoRecordsContent>
                         <MudText>No data available</MudText>
                     </NoRecordsContent>
+                    <ColGroup>
+                        <col style="min-width: 180px" />
+                        <col style="min-width: 250px" />
+                        <col style="min-width: 130px" />
+                        <col style="min-width: 170px" />
+                        <col style="min-width: 170px" />
+                        <col style="min-width: 150px" />
+                        <col style="min-width: 180px" />
+                        <col style="min-width: 210px" />
+                        <col style="min-width: 170px" />
+                    </ColGroup>
                     <Columns>
-                        <PropertyColumn Property="x => x.PersonId" Title="Employee ID" HeaderClass="text-nowrap" />
-                        <PropertyColumn Property="x => x.Name" Title="Employee Name" HeaderClass="text-nowrap" CellClass="text-nowrap" />
-                        <PropertyColumn Property="@(x => x.Date.ToString("dd MMM yyyy"))" HeaderClass="text-nowrap" />
-                        <PropertyColumn Property="x => x.InitialTime" Title="Initial Time" HeaderClass="text-nowrap" />
-                        <PropertyColumn Property="x => x.FinalTime" Title="Final Time" HeaderClass="text-nowrap" />
-                        <PropertyColumn Property="x => x.WorkCell" Title="Work Cell" HeaderClass="text-nowrap" />
-                        <PropertyColumn Property="x => x.Department" HeaderClass="text-nowrap" />
-                        <PropertyColumn Property="x => x.ShiftGroup" Title="Shift Group" HeaderClass="text-nowrap" />
+                        <PropertyColumn Property="x => x.PersonId" Title="Employee ID" />
+                        <PropertyColumn Property="x => x.Name" Title="Employee Name" />
+                        <PropertyColumn Property="@(x => x.Date.ToString("dd MMM yyyy"))" />
+                        <PropertyColumn Property="x => x.InitialTime" Title="Initial Time" />
+                        <PropertyColumn Property="x => x.FinalTime" Title="Final Time" />
+                        <PropertyColumn Property="x => x.Building" />
+                        <PropertyColumn Property="x => x.Department" />
+                        <PropertyColumn Property="x => x.WorkCell" Title="Work Cell" />
+                        <PropertyColumn Property="x => x.ShiftGroup" Title="Shift Group" />
                         <TemplateColumn StickyRight>
                             <CellTemplate>
                                 <MudStack Row>
-                                    <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Filled.RemoveRedEye"/>
+                                    <MudIconButton
+                                        Size="@Size.Small"
+                                        Icon="@Icons.Material.Rounded.RemoveRedEye"
+                                        OnClick="() => ViewEmployeeTurnstileMovement(context.Item.PersonId, context.Item.Date)"
+                                        title="View Employee Turnstile Movement"
+                                    />
                                 </MudStack>
                             </CellTemplate>
                         </TemplateColumn>
@@ -165,7 +187,7 @@
         isTableLoading = true;
 
         dashboardData = EmployeeMovementService.DashboardData(filter.Date);
-        presentEmployees = await EmployeeMovementService.PresentEmployeeMovementList(filter);
+        presentEmployees = await EmployeeTimeTrackingService.PresentEmployeeMovementList(filter);
 
         isTableLoading = false;
     }
@@ -176,16 +198,14 @@
     // Reset/clear the list filter
     private Task ResetFilter()
     {
-        filter = new EmployeeMovementFilter
-        {
-            Date = DateTime.Parse("2021-6-13")
-        };
+        filter = new EmployeeMovementFilter { Date = DateTime.Parse("2021-6-13") };
         return LoadFilteredData();
     }
 
     // View the employee turnstile movement details
-    private void ViewEmployeeTurnstileMovement(string personID, DateOnly date)
+    private void ViewEmployeeTurnstileMovement(string personId, DateOnly date)
     {
-        Navigation.NavigateTo($"/employeeTurnstileMovement/{personID}?Date={date}", true);
+        // Navigation.NavigateTo($"/employeeTurnstileMovement/{personID}/{date}", true);
+        Navigation.NavigateTo($"/employeeTurnstileMovement/{personId}?Date={date:yyyy-MM-dd}", true);
     }
 }

@@ -69,34 +69,6 @@ namespace EmpMovementTracker.Services
             };
         }
 
-        // Get the list of present employee movement based on the date.
-        public async Task<List<EmployeeTimeTracking>> PresentEmployeeMovementList(EmployeeMovementFilter dto)
-        {
-            var list = context.EmployeeTimeTrackings.Where(a => a.Date == DateOnly.FromDateTime((DateTime)dto.Date)).AsQueryable();
-
-            // Filter the list of present employee movements.
-            if (!string.IsNullOrEmpty(dto.Name))
-                list = list.Where(a => EF.Functions.Like(a.Name, $"%{dto.Name}%"));
-
-            if (!string.IsNullOrEmpty(dto.WorkCell))
-                list = list.Where(a => a.WorkCell == dto.WorkCell);
-
-            if (!string.IsNullOrEmpty(dto.Department))
-                list = list.Where(a => a.Department == dto.Department);
-
-            return await list.ToListAsync();
-        }
-
-        // Get the employee info of an employee on a certain date.
-        public EmployeeMovement EmployeeInfo(string personId, DateTime date)
-        {
-            var employeeInfo = context.EmployeeMovements
-                .Where(a => a.PersonId == personId & a.Date == DateOnly.FromDateTime((DateTime)date))
-                .LastOrDefault();
-
-            return employeeInfo ?? new EmployeeMovement();
-        }
-
         // Get the list of employee turnstile movement of an employee on a certain date.
         public async Task<List<EmployeeMovement>> EmployeeTurnstileMovementList([FromQuery] EmployeeMovementFilter dto, [FromQuery] string personId)
         {
@@ -104,23 +76,88 @@ namespace EmpMovementTracker.Services
                 .Select(g => new EmployeeMovement
                 {
                     Id = g.Id,
-                    Date = g.Date,
                     Time = g.Time,
                     Station = g.Station,
                     DepartmentCode = g.DepartmentCode,
                     ShiftGroupId = g.ShiftGroupId,
-                    ShiftGroup = g.ShiftGroup,
                     BuildingId = string.IsNullOrEmpty(g.BuildingId) ? "N/A" : g.BuildingId,
-                    Building = string.IsNullOrEmpty(g.Building) ? "N/A" : g.Building,
                 }).OrderBy(g => g.Time).AsQueryable();
 
             if (!string.IsNullOrEmpty(dto.Station))
                 list = list.Where(a => EF.Functions.Like(a.Station, $"%{dto.Station}%"));
 
-            if (!string.IsNullOrEmpty(dto.Building))
-                list = list.Where(a => a.Building == dto.Building);
+            if (!string.IsNullOrEmpty(dto.BuildingId))
+                list = list.Where(a => a.BuildingId == dto.BuildingId);
 
             return await list.ToListAsync();
+        }
+
+        // Update the existing employee turnstile movement.
+        public async void Update(EmployeeMovementEdit dto, int id)
+        {
+            var movementList = context.EmployeeMovements.Where(a => a.PersonId == dto.PersonId).AsQueryable();
+            var timeTrackingList = context.EmployeeTimeTrackings.Where(a => a.PersonId == dto.PersonId).AsQueryable();
+
+            foreach (var timeTrackingInfo in timeTrackingList)
+            {
+                timeTrackingInfo.WorkCell = dto.WorkCell;
+                timeTrackingInfo.Department = dto.Department;
+                timeTrackingInfo.ShiftGroup = dto.ShiftGroup;
+                timeTrackingInfo.Building = dto.Building;
+            }
+
+            foreach (var movementInfo in movementList)
+            {
+                if (movementInfo.Id == id)
+                {
+                    movementInfo.DateTime = dto.DateTime;
+                    movementInfo.Date = DateOnly.FromDateTime(dto.DateTime);
+                    movementInfo.Time = TimeOnly.FromDateTime(dto.DateTime);
+                    movementInfo.Station = dto.Station;
+                    movementInfo.BuildingId = dto.BuildingId;
+                }
+                movementInfo.WorkCell = dto.WorkCell;
+                movementInfo.DepartmentCode = dto.DepartmentCode;
+                movementInfo.Department = dto.Department;
+                movementInfo.ShiftGroupId = dto.ShiftGroupId;
+                movementInfo.ShiftGroup = dto.ShiftGroup;
+                movementInfo.Building = dto.Building;
+            }
+
+            context.EmployeeTimeTrackings.UpdateRange(timeTrackingList);
+            context.EmployeeMovements.UpdateRange(movementList);
+            await context.SaveChangesAsync();
+        }
+
+        // Delete the existing employee turnstile movement.
+        public async Task<ServiceResponse> Delete(int id)
+        {
+            try
+            {
+                var existingEmployeeMovement = context.EmployeeMovements.Where(a => a.Id == id).FirstOrDefault();
+                context.EmployeeMovements.Remove(existingEmployeeMovement);
+                await context.SaveChangesAsync();
+
+                var any = context.EmployeeMovements
+                    .Where(a => a.PersonId == existingEmployeeMovement.PersonId && a.Date == existingEmployeeMovement.Date)
+                    .Any();
+
+                if (!any)
+                {
+                    var existingEmployeeTimeTracking = context.EmployeeTimeTrackings
+                        .Where(a => a.PersonId == existingEmployeeMovement.PersonId && a.Date == existingEmployeeMovement.Date)
+                        .FirstOrDefault();
+
+                    context.EmployeeTimeTrackings.Remove(existingEmployeeTimeTracking);
+                    await context.SaveChangesAsync();
+                }
+
+                return new() { Success = true, Message = "The employee turnstile movement has been deleted" };
+            }
+            catch (Exception ex)
+            {
+                return new() { Success = false, Message = ex.Message };
+            }
         }
     }
 }

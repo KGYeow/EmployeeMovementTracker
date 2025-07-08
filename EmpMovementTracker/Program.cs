@@ -2,6 +2,7 @@ using EmpMovementTracker.Components;
 using EmpMovementTracker.Models;
 using EmpMovementTracker.Services;
 using Microsoft.EntityFrameworkCore;
+using MudBlazor;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,8 +15,19 @@ builder.Services.AddDbContext<TurnstileDbContext>(options =>
 
 // Add services to the container.
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
-builder.Services.AddMudServices();
+builder.Services.AddMudServices(config =>
+{
+    // Add configurations for snackbar
+    config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomLeft;
+    config.SnackbarConfiguration.PreventDuplicates = false;
+    config.SnackbarConfiguration.NewestOnTop = false;
+    config.SnackbarConfiguration.VisibleStateDuration = 4000;
+    config.SnackbarConfiguration.HideTransitionDuration = 500;
+    config.SnackbarConfiguration.ShowTransitionDuration = 500;
+    config.SnackbarConfiguration.MaximumOpacity = 90;
+});
 builder.Services.AddScoped<EmployeeMovementService>();
+builder.Services.AddScoped<EmployeeTimeTrackingService>();
 
 var app = builder.Build();
 

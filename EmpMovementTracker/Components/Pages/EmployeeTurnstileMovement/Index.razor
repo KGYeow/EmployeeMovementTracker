@@ -1,10 +1,211 @@
-﻿@page "/employeeTurnstileMovement"
+﻿@page "/employeeTurnstileMovement/{PersonId}"
+
 @using EmpMovementTracker.DTOs
+@using EmpMovementTracker.Models
 @using EmpMovementTracker.Services
+@using EmpMovementTracker.Components.Shared
+
 @inject EmployeeMovementService EmployeeMovementService
+@inject EmployeeTimeTrackingService EmployeeTimeTrackingService
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
 @inject NavigationManager Navigation
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Employee Turnstile Movement</PageTitle>
 
 <!-- Page Title-->
-<h2 class="mt-4 mb-4 fw-bold">Present Employee Movement</h2>
+<h2 class="mb-6 fw-bold">Employee Turnstile Movement</h2>
+
+<MudGrid>
+    <!-- Employee Info -->
+    <MudItem xs="12">
+        <MudCard Elevation="25" Style="background: linear-gradient(45deg,rgb(234, 232, 255) 50%, rgb(255, 255, 255) 90%);">
+            <MudCardHeader>
+                <CardHeaderAvatar>
+                    <MudIcon Icon="@Icons.Material.Rounded.Person" Color="Color.Default" Size="Size.Large"/>
+                </CardHeaderAvatar>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6" Style="line-height: normal">@employeeInfo.Name</MudText>
+                    <MudText Typo="Typo.caption" Class="text-muted" Style="line-height: normal" HtmlTag="i">Employee ID: @employeeInfo.PersonId</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent Class="pt-0">
+                <MudStack Row Wrap="Wrap.Wrap" StretchItems="StretchItems.All">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.subtitle2">Date</MudText>
+                        <MudText Typo="Typo.body2" Class="text-muted">@Date.ToString("dd MMM yyyy")</MudText>
+                    </MudStack>
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.subtitle2">Building</MudText>
+                        <MudText Typo="Typo.body2" Class="text-muted">@employeeInfo.Building</MudText>
+                    </MudStack>
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.subtitle2">Department</MudText>
+                        <MudText Typo="Typo.body2" Class="text-muted">@employeeInfo.Department</MudText>
+                    </MudStack>
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.subtitle2">Work Cell</MudText>
+                        <MudText Typo="Typo.body2" Class="text-muted">@employeeInfo.WorkCell</MudText>
+                    </MudStack>
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.subtitle2">Shift Group</MudText>
+                        <MudText Typo="Typo.body2" Class="text-muted">@employeeInfo.ShiftGroup</MudText>
+                    </MudStack>
+                </MudStack>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+
+    <!-- Filter Section -->
+    <MudItem xs="12">
+        <MudCard Elevation="25">
+            <MudCardContent>
+                <EditForm FormName="EmployeeMovementFilterForm" Model="@filter" OnValidSubmit="ApplyFilter">
+                    <MudStack Row Wrap="Wrap.Wrap">
+                        <MudItem Class="flex-grow-1">
+                            <!-- Station Filter -->
+                            <MudTextField @bind-Value="filter.Station" Variant="Variant.Text" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Rounded.Search" Placeholder="Search by station" />
+                        </MudItem>
+                        <div class="vr"></div>
+                        <MudItem Style="width: 200px">
+                            <!-- Work Cell Filter -->
+                            @if (filterOptions?.BuildingIds != null)
+                            {
+                                <MudSelect @bind-Value="filter.BuildingId" Variant="Variant.Text" Placeholder="Accessed Building ID">
+                                    @foreach (var buildingId in filterOptions.BuildingIds)
+                                    {
+                                        <MudSelectItem Value="buildingId">@buildingId</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            }
+                            else
+                            {
+                                <MudSkeleton Animation="Animation.Wave" Height="100%" />
+                            }
+                        </MudItem>
+                        <div class="vr"></div>
+                        <MudStack Row Spacing="2">
+                            <!-- Filter Button -->
+                            <MudIconButton ButtonType="ButtonType.Submit" Icon="@Icons.Material.Rounded.FilterAlt" Size="Size.Small" title="Filter" />
+                            <!-- Reset Button -->
+                            <MudIconButton Icon="@Icons.Material.Rounded.Refresh" Size="Size.Small" title="Reset Filter" OnClick="ResetFilter" />
+                        </MudStack>
+                    </MudStack>
+                </EditForm>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+
+    <!-- List of Employee Turnstile Movement -->
+    <MudItem xs="12">
+        <MudCard Elevation="25">
+            <MudCardContent>
+                <MudDataGrid
+                    T="EmployeeMovement"
+                    Items="employeeMovements"
+                    Loading="@isTableLoading"
+                    SortMode="SortMode.Single"
+                    ColumnResizeMode="ResizeMode.Container"
+                    Elevation="0"
+                    Hover
+                    Dense
+                >
+                    <LoadingContent>
+                        <MudText>Loading data...</MudText>
+                    </LoadingContent>
+                    <NoRecordsContent>
+                        <MudText>No data available</MudText>
+                    </NoRecordsContent>
+                    <ColGroup>
+                        <col style="min-width: 150px"/>
+                        <col style="min-width: 30vw"/>
+                        <col style="min-width: 240px" />
+                        <col style="min-width: 210px" />
+                        <col style="min-width: 190px" />
+                    </ColGroup>
+                    <Columns>
+                        <PropertyColumn Property="@(x => x.Time.ToLongTimeString())"/>
+                        <PropertyColumn Property="x => x.Station"/>
+                        <PropertyColumn Property="x => x.BuildingId" Title="Accessed Building ID" />
+                        <PropertyColumn Property="x => x.DepartmentCode" Title="Department Code"/>
+                        <PropertyColumn Property="x => x.ShiftGroupId" Title="Shift Group ID"/>
+                        <TemplateColumn StickyRight>
+                            <CellTemplate>
+                                <MudStack Row>
+                                    <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Rounded.Edit" title="Edit" />
+                                    <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Rounded.Delete" title="Delete" OnClick="() => DeleteEmployeeTurnstileMovement(context.Item.Id)" />
+                                </MudStack>
+                            </CellTemplate>
+                        </TemplateColumn>
+                    </Columns>
+                    <PagerContent>
+                        <MudDataGridPager T="EmployeeMovement" />
+                    </PagerContent>
+                </MudDataGrid>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter]
+    public string PersonId { get; set; } = null!;
+
+    [Parameter, SupplyParameterFromQuery]
+    public DateOnly Date { get; set; }
+
+    // Variable declaration & initialization
+    private bool isTableLoading = true;
+    private EmployeeMovementFilter filter = new();
+    private EmployeeMovementFilterSelection filterOptions = new();
+    private EmployeeTimeTracking employeeInfo = new();
+    private IEnumerable<EmployeeMovement>? employeeMovements;
+
+    // Action on component initialization
+    protected override async Task OnInitializedAsync()
+    {
+        filter = new EmployeeMovementFilter { Date = Date.ToDateTime(TimeOnly.MinValue) };
+        filterOptions = await EmployeeMovementService.GetInitializedSelections();
+        employeeInfo = await EmployeeTimeTrackingService.EmployeeInfo(PersonId, Date);
+
+        // Load data depending on filter
+        await LoadFilteredData();
+    }
+
+    // Load the filtered data
+    private async Task LoadFilteredData()
+    {
+        isTableLoading = true;
+        employeeMovements = await EmployeeMovementService.EmployeeTurnstileMovementList(filter, PersonId);
+        isTableLoading = false;
+    }
+
+    // Apply the filter to the list.
+    private Task ApplyFilter() => LoadFilteredData();
+
+    // Reset/clear the list filter
+    private Task ResetFilter()
+    {
+        filter = new EmployeeMovementFilter { Date = Date.ToDateTime(TimeOnly.MinValue) };
+        return LoadFilteredData();
+    }
+
+    // Open the delete confirmation dialog for deleting employee turnstile movement
+    private async Task DeleteEmployeeTurnstileMovement(int itemId)
+    {
+        var parameters = new DialogParameters<DeleteConfirmationDialog>
+        {
+            { x => x.ContentText, "Are you sure you want to delete the turnstile movement data for this employee? This action is permanent and cannot be undone." },
+        };
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+        var dialog = await DialogService.ShowAsync<DeleteConfirmationDialog>("Delete Confirmation", parameters, options);
+        var dialogResult = await dialog.Result;
+
+        if (!dialogResult.Canceled)
+        {
+            // Delete the employee turnstile movement
+            var response = await EmployeeMovementService.Delete(itemId);
+            Snackbar.Add(response.Message, response.Success ? Severity.Success : Severity.Error);
+        }
+    }
+}
