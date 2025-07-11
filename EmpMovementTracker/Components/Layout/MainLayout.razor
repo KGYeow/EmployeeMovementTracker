@@ -11,12 +11,6 @@
 <MudSnackbarProvider />
 
 <MudLayout>
-    <!-- Topbar -->
-    <MudAppBar Color="Color.Primary">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <h4 class="mt-4 mb-4 ms-2 fw-bold">Employee Movement Tracker</h4>
-    </MudAppBar>
-
     <!-- Sidebar -->
     <MudDrawer Class="py-3" Color="Color.Primary" @bind-Open="@drawerOpen">
         <NavMenu />
@@ -24,6 +18,13 @@
 
     <!-- Main Content -->
     <MudMainContent Class="min-vh-100">
+        <!-- Topbar -->
+        <MudAppBar Color="Color.Primary">
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+            <h4 class="mt-4 mb-4 ms-2 fw-bold">Employee Movement Tracker</h4>
+        </MudAppBar>
+
+        <!-- Page Content -->
         <MudContainer Class="my-6" MaxWidth="MaxWidth.Large">
             @Body
         </MudContainer>

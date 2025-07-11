@@ -3,9 +3,11 @@
 @using EmpMovementTracker.DTOs
 @using EmpMovementTracker.Models
 @using EmpMovementTracker.Services
+@using Microsoft.AspNetCore.WebUtilities;
 
 @inject EmployeeMovementService EmployeeMovementService
 @inject EmployeeTimeTrackingService EmployeeTimeTrackingService
+@inject ISnackbar Snackbar
 @inject NavigationManager Navigation
 
 <PageTitle>Home</PageTitle>
@@ -91,7 +93,7 @@
                         <div class="vr"></div>
                         <MudStack Row>
                             <!-- Add Employee Turnstile Movement Button -->
-                            <MudButton IconClass="me-1" StartIcon="@Icons.Material.Rounded.Add" Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" Href="/EmployeeMovement/Create" title="Add Employee Turnstile Movement">
+                            <MudButton IconClass="me-1" StartIcon="@Icons.Material.Rounded.Add" Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" DropShadow="false" Href="/EmployeeMovement/Create" title="Add Employee Turnstile Movement">
                                 Insert
                             </MudButton>
                         </MudStack>
@@ -175,7 +177,15 @@
     // Action on component initialization
     protected override async Task OnInitializedAsync()
     {
-        filterOptions = await EmployeeMovementService.GetInitializedSelections();
+        try
+        {
+            filterOptions = await EmployeeMovementService.GetInitializedSelections();
+            dashboardData = EmployeeMovementService.DashboardData(filter.Date);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("An error occurred while loading the page data. Please refresh the page or try again later.", Severity.Error);
+        }
 
         // Load data depending on filter
         await LoadFilteredData();
@@ -185,10 +195,14 @@
     private async Task LoadFilteredData()
     {
         isTableLoading = true;
-
-        dashboardData = EmployeeMovementService.DashboardData(filter.Date);
-        presentEmployees = await EmployeeTimeTrackingService.PresentEmployeeMovementList(filter);
-
+        try
+        {
+            presentEmployees = await EmployeeTimeTrackingService.PresentEmployeeMovementList(filter);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("An error occurred while loading the list of present employee movement. Please refresh the page or try again later.", Severity.Error);
+        }
         isTableLoading = false;
     }
 
@@ -205,7 +219,10 @@
     // View the employee turnstile movement details
     private void ViewEmployeeTurnstileMovement(string personId, DateOnly date)
     {
-        // Navigation.NavigateTo($"/employeeTurnstileMovement/{personID}/{date}", true);
-        Navigation.NavigateTo($"/employeeTurnstileMovement/{personId}?Date={date:yyyy-MM-dd}", true);
+        var fullUrl = QueryHelpers.AddQueryString($"/employeeTurnstileMovement/{personId}",new Dictionary<string, string?>
+            {
+                ["Date"] = date.ToString("yyyy-MM-dd")
+            });
+        Navigation.NavigateTo(fullUrl, true);
     }
 }

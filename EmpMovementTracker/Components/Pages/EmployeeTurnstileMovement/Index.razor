@@ -1,5 +1,6 @@
-﻿@page "/employeeTurnstileMovement/{PersonId}"
+﻿@page "/employeeTurnstileMovement/{personId}"
 
+@using Microsoft.AspNetCore.WebUtilities;
 @using EmpMovementTracker.DTOs
 @using EmpMovementTracker.Models
 @using EmpMovementTracker.Services
@@ -26,7 +27,7 @@
                 </CardHeaderAvatar>
                 <CardHeaderContent>
                     <MudText Typo="Typo.h6" Style="line-height: normal">@employeeInfo.Name</MudText>
-                    <MudText Typo="Typo.caption" Class="text-muted" Style="line-height: normal" HtmlTag="i">Employee ID: @employeeInfo.PersonId</MudText>
+                    <MudText Typo="Typo.caption" Class="text-muted" Style="line-height: normal" HtmlTag="i">Employee ID: @PersonId</MudText>
                 </CardHeaderContent>
             </MudCardHeader>
             <MudCardContent Class="pt-0">
@@ -132,7 +133,7 @@
                         <TemplateColumn StickyRight>
                             <CellTemplate>
                                 <MudStack Row>
-                                    <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Rounded.Edit" title="Edit" />
+                                    <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Rounded.Edit" title="Edit" OnClick="() => EditEmployeeTurnstileMovement(context.Item.Id)" />
                                     <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Rounded.Delete" title="Delete" OnClick="() => DeleteEmployeeTurnstileMovement(context.Item.Id)" />
                                 </MudStack>
                             </CellTemplate>
@@ -164,9 +165,16 @@
     // Action on component initialization
     protected override async Task OnInitializedAsync()
     {
-        filter = new EmployeeMovementFilter { Date = Date.ToDateTime(TimeOnly.MinValue) };
-        filterOptions = await EmployeeMovementService.GetInitializedSelections();
-        employeeInfo = await EmployeeTimeTrackingService.EmployeeInfo(PersonId, Date);
+        try
+        {
+            filter = new EmployeeMovementFilter { Date = Date.ToDateTime(TimeOnly.MinValue) };
+            filterOptions = await EmployeeMovementService.GetInitializedSelections();
+            employeeInfo = await EmployeeTimeTrackingService.EmployeeInfo(PersonId, Date);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("An error occurred while loading the page data. Please refresh the page or try again later.", Severity.Error);
+        }
 
         // Load data depending on filter
         await LoadFilteredData();
@@ -176,21 +184,34 @@
     private async Task LoadFilteredData()
     {
         isTableLoading = true;
-        employeeMovements = await EmployeeMovementService.EmployeeTurnstileMovementList(filter, PersonId);
+        try
+        {
+            employeeMovements = await EmployeeMovementService.EmployeeTurnstileMovementList(filter, PersonId);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("An error occurred while loading the list of employee turnstile movement. Please refresh the page or try again later.", Severity.Error);
+        }
         isTableLoading = false;
     }
 
     // Apply the filter to the list.
-    private Task ApplyFilter() => LoadFilteredData();
+    private async Task ApplyFilter() => await LoadFilteredData();
 
     // Reset/clear the list filter
-    private Task ResetFilter()
+    private async Task ResetFilter()
     {
         filter = new EmployeeMovementFilter { Date = Date.ToDateTime(TimeOnly.MinValue) };
-        return LoadFilteredData();
+        await LoadFilteredData();
     }
 
-    // Open the delete confirmation dialog for deleting employee turnstile movement
+    // Edit the employee turnstile movement
+    private void EditEmployeeTurnstileMovement(int employeeMovementId)
+    {
+        Navigation.NavigateTo($"/employeeTurnstileMovement/{PersonId}/{Date.ToString("yyyy-MM-dd")}/{employeeMovementId}/edit", true);
+    }
+
+    // Delete the employee turnstile movement (open the delete confirmation dialog)
     private async Task DeleteEmployeeTurnstileMovement(int itemId)
     {
         var parameters = new DialogParameters<DeleteConfirmationDialog>
@@ -203,9 +224,16 @@
 
         if (!dialogResult.Canceled)
         {
-            // Delete the employee turnstile movement
-            var response = await EmployeeMovementService.Delete(itemId);
-            Snackbar.Add(response.Message, response.Success ? Severity.Success : Severity.Error);
+            try
+            {
+                // Delete the employee turnstile movement
+                await EmployeeMovementService.Delete(itemId);
+                Snackbar.Add("The employee turnstile movement has been deleted.", Severity.Success);
+            }
+            catch (Exception)
+            {
+                Snackbar.Add("An unexpected error occurred while deleting employee turnstile movement data. Please try again.", Severity.Error);
+            }
         }
     }
 }

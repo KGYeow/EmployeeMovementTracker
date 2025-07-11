@@ -1,0 +1,222 @@
+﻿@page "/employeeTurnstileMovement/{personId}/{date:datetime}/{employeeMovementId:int}/edit"
+
+@using EmpMovementTracker.DTOs
+@using EmpMovementTracker.Services
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.WebUtilities
+
+@inject EmployeeMovementService EmployeeMovementService
+@inject ISnackbar Snackbar
+@inject NavigationManager Navigation
+
+<PageTitle>Edit Employee Turnstile Movement</PageTitle>
+
+<!-- Page Title-->
+<h2 class="mb-6 fw-bold">Edit Employee Turnstile Movement</h2>
+
+<MudGrid>
+    <!-- Employee Turnstile Movement Edit Form -->
+    <MudItem xs="12">
+        <MudCard Elevation="25">
+            <EditForm FormName="EmployeeMovementEditForm" Model="@editEmployeeMovement" OnValidSubmit="UpdateEmployeeTurnstileMovement">
+                <MudCardContent Class="d-flex flex-column gap-4">
+                    <DataAnnotationsValidator />
+                    <!-- Employee Informaton -->
+                    <div>
+                        <MudText Typo="Typo.body1" Class="fw-bold mb-1">Employee Information</MudText>
+                        <MudGrid>
+                            <!-- Employee Name -->
+                            <MudItem xs="12" sm="6">
+                                <MudInputLabel>Name *</MudInputLabel>
+                                <MudTextField T="string" Value="editEmployeeMovement.Name" Disabled />
+                            </MudItem>
+                            <!-- Employee ID -->
+                            <MudItem xs="12" sm="6">
+                                <MudInputLabel>Employee ID *</MudInputLabel>
+                                <MudTextField T="string" Value="PersonId" Disabled />
+                            </MudItem>
+                            <!-- Work Cell -->
+                            <MudItem xs="12" sm="4">
+                                <MudInputLabel>Work Cell *</MudInputLabel>
+                                <MudAutocomplete T="string" @bind-Value="editEmployeeMovement.WorkCell" SearchFunc="filterOptions.SearchWorkCell" MaxItems="null" For="@(() => editEmployeeMovement.WorkCell)" Dense>
+                                    <NoItemsTemplate>
+                                        <MudText Align="Align.Center" Class="px-4 py-1">
+                                            No items found
+                                        </MudText>
+                                    </NoItemsTemplate>
+                                </MudAutocomplete>
+                            </MudItem>
+                            <!-- Shift Group ID -->
+                            <MudItem xs="12" sm="4">
+                                <MudInputLabel>Shift Group ID *</MudInputLabel>
+                                <MudAutocomplete T="string" @bind-Value="editEmployeeMovement.ShiftGroupId" SearchFunc="filterOptions.SearchShiftGroupId" MaxItems="null" For="@(() => editEmployeeMovement.ShiftGroupId)" Dense>
+                                    <NoItemsTemplate>
+                                        <MudText Align="Align.Center" Class="px-4 py-1">
+                                            No items found
+                                        </MudText>
+                                    </NoItemsTemplate>
+                                </MudAutocomplete>
+                            </MudItem>
+                            <!-- Shift Group -->
+                            <MudItem xs="12" sm="4">
+                                <MudInputLabel>Shift Group *</MudInputLabel>
+                                <MudNumericField @bind-Value="editEmployeeMovement.ShiftGroup" Min="0" For="@(() => editEmployeeMovement.ShiftGroup)" />
+                            </MudItem>
+                            <!-- Department Code -->
+                            <MudItem xs="12" sm="4">
+                                <MudInputLabel>Department Code *</MudInputLabel>
+                                <MudAutocomplete T="string" @bind-Value="editEmployeeMovement.DepartmentCode" SearchFunc="filterOptions.SearchDepartmentCode" MaxItems="null" For="@(() => editEmployeeMovement.DepartmentCode)" Dense>
+                                    <NoItemsTemplate>
+                                        <MudText Align="Align.Center" Class="px-4 py-1">
+                                            No items found
+                                        </MudText>
+                                    </NoItemsTemplate>
+                                </MudAutocomplete>
+                            </MudItem>
+                            <!-- Department -->
+                            <MudItem xs="12" sm="4">
+                                <MudInputLabel>Department *</MudInputLabel>
+                                <MudAutocomplete T="string" @bind-Value="editEmployeeMovement.Department" SearchFunc="filterOptions.SearchDepartment" MaxItems="null" For="@(() => editEmployeeMovement.Department)" Dense>
+                                    <NoItemsTemplate>
+                                        <MudText Align="Align.Center" Class="px-4 py-1">
+                                            No items found
+                                        </MudText>
+                                    </NoItemsTemplate>
+                                </MudAutocomplete>
+                            </MudItem>
+                            <!-- Building -->
+                            <MudItem xs="12" sm="4">
+                                <MudInputLabel>Building *</MudInputLabel>
+                                <MudAutocomplete T="string" @bind-Value="editEmployeeMovement.Building" SearchFunc="filterOptions.SearchBuilding" MaxItems="null" For="@(() => editEmployeeMovement.Building)" Dense>
+                                    <NoItemsTemplate>
+                                        <MudText Align="Align.Center" Class="px-4 py-1">
+                                            No items found
+                                        </MudText>
+                                    </NoItemsTemplate>
+                                </MudAutocomplete>
+                            </MudItem>
+                        </MudGrid>
+                    </div>
+                    <MudDivider />
+                    <!-- Turnstile Access Details -->
+                    <div>
+                        <MudText Typo="Typo.body1" Class="fw-bold mb-1">Turnstile Access Details</MudText>
+                        <MudGrid>
+                            <!-- Date -->
+                            <MudItem xs="12" sm="4">
+                                <MudInputLabel>Date *</MudInputLabel>
+                                <MudDatePicker @bind-Date="editEmployeeMovement.Date" DateFormat="dd/MM/yyyy" Editable="true" For="@(() => editEmployeeMovement.Date)" />
+                            </MudItem>
+                            <!-- Time -->
+                            <MudItem xs="12" sm="4">
+                                <MudInputLabel>Time *</MudInputLabel>
+                                <MudTimePicker @bind-Time="editEmployeeMovement.Time" TimeFormat="hh:mm:ss tt" AmPm="true" Editable="true" For="@(() => editEmployeeMovement.Time)" />
+                            </MudItem>
+                            <!-- Accessed Building ID -->
+                            <MudItem xs="12" sm="4">
+                                <MudInputLabel>Accessed Building ID *</MudInputLabel>
+                                <MudAutocomplete T="string" @bind-Value="editEmployeeMovement.BuildingId" SearchFunc="filterOptions.SearchBuildingId" MaxItems="null" For="@(() => editEmployeeMovement.BuildingId)" Dense>
+                                    <NoItemsTemplate>
+                                        <MudText Align="Align.Center" Class="px-4 py-1">
+                                            No items found
+                                        </MudText>
+                                    </NoItemsTemplate>
+                                </MudAutocomplete>
+                            </MudItem>
+                            <!-- Station -->
+                            <MudItem xs="12">
+                                <MudInputLabel>Station *</MudInputLabel>
+                                <MudTextField T="string" @bind-Value="editEmployeeMovement.Station" For="@(() => editEmployeeMovement.Station)" />
+                            </MudItem>
+                        </MudGrid>
+                    </div>
+                </MudCardContent>
+                <MudCardActions Class="justify-content-end gap-2">
+                    <!-- Cancel Button -->
+                    <MudButton Color="Color.Primary" title="Cancel" OnClick="() => CancelEditEmployeeTurnstileMovement()">
+                        Cancel
+                    </MudButton>
+                    <!-- Submit Button -->
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" DropShadow="false" title="Submit">
+                        Submit
+                    </MudButton>
+                </MudCardActions>
+            </EditForm>
+        </MudCard>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter] public string PersonId { get; set; } = null!;
+    [Parameter] public DateTime Date { get; set; }
+    [Parameter] public int EmployeeMovementId { get; set; }
+
+    // Variable declaration & initialization
+    private bool isFormLoading = true;
+    private EmployeeMovementFilterSelection filterOptions = new();
+    private EmployeeMovementEdit editEmployeeMovement = new();
+    private MudForm form = null!;
+
+    // Action on component initialization
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            filterOptions = await EmployeeMovementService.GetInitializedSelections();
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("An error occurred while loading the page data. Please refresh the page or try again later.", Severity.Error);
+        }
+
+        // Load data depending on filter
+        await LoadFormData();
+    }
+
+    // Load the form data
+    private async Task LoadFormData()
+    {
+        isFormLoading = true;
+        try
+        {
+            editEmployeeMovement = await EmployeeMovementService.Edit(EmployeeMovementId);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("An unexpected error occurred while loading employee turnstile movement data. Please try again.", Severity.Error);
+        }
+        isFormLoading = false;
+    }
+
+    // Update the employee turnstile movement
+    private async Task UpdateEmployeeTurnstileMovement()
+    {
+        try
+        {
+            // Update the employee turnstile movement
+            await EmployeeMovementService.Update(editEmployeeMovement, EmployeeMovementId);
+            Snackbar.Add("The employee turnstile movement has been updated.", Severity.Success);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("An unexpected error occurred while updating employee turnstile movement data. Please try again.", Severity.Error);
+        }
+    }
+
+    // Cancel editing the employee turnstile movement
+    private void CancelEditEmployeeTurnstileMovement()
+    {
+        if (!string.IsNullOrWhiteSpace(PersonId))
+        {
+            var fullUrl = QueryHelpers.AddQueryString($"/employeeTurnstileMovement/{PersonId}", new Dictionary<string, string?>
+            {
+                ["Date"] = Date.ToString("yyyy-MM-dd")
+            });
+            Navigation.NavigateTo(fullUrl, true);
+        }
+        else
+        {
+            Snackbar.Add("Navigation failed: Missing employee ID. Please return manually.", Severity.Warning);
+        }
+    }
+}

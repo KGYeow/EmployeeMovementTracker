@@ -92,8 +92,33 @@ namespace EmpMovementTracker.Services
             return await list.ToListAsync();
         }
 
+        // Get the specific employee turnstile movement of an employee.
+        public async Task<EmployeeMovementEdit> Edit(int id)
+        {
+            var empMovement = await context.EmployeeMovements.Where(a => a.Id == id).FirstOrDefaultAsync();
+            if (empMovement == null)
+                throw new Exception("Employee turnstile movement data not found.");
+
+            var editDto = new EmployeeMovementEdit
+            {
+                PersonId = empMovement.PersonId,
+                Name = empMovement.Name,
+                Date = empMovement.Date.ToDateTime(TimeOnly.MinValue),
+                Time = empMovement.Time.ToTimeSpan(),
+                Station = empMovement.Station,
+                WorkCell = empMovement.WorkCell,
+                DepartmentCode = empMovement.DepartmentCode,
+                Department = empMovement.Department,
+                ShiftGroupId = empMovement.ShiftGroupId,
+                ShiftGroup = empMovement.ShiftGroup,
+                BuildingId = empMovement.BuildingId,
+                Building = empMovement.Building,
+            };
+            return editDto;
+        }
+
         // Update the existing employee turnstile movement.
-        public async void Update(EmployeeMovementEdit dto, int id)
+        public async Task Update(EmployeeMovementEdit dto, int id)
         {
             var movementList = context.EmployeeMovements.Where(a => a.PersonId == dto.PersonId).AsQueryable();
             var timeTrackingList = context.EmployeeTimeTrackings.Where(a => a.PersonId == dto.PersonId).AsQueryable();
@@ -110,9 +135,9 @@ namespace EmpMovementTracker.Services
             {
                 if (movementInfo.Id == id)
                 {
-                    movementInfo.DateTime = dto.DateTime;
-                    movementInfo.Date = DateOnly.FromDateTime(dto.DateTime);
-                    movementInfo.Time = TimeOnly.FromDateTime(dto.DateTime);
+                    movementInfo.DateTime = (dto.Date + dto.Time) ?? DateTime.MinValue;
+                    movementInfo.Date = DateOnly.FromDateTime(dto.Date ?? DateTime.MinValue);
+                    movementInfo.Time = TimeOnly.FromTimeSpan(dto.Time ?? TimeSpan.MinValue);
                     movementInfo.Station = dto.Station;
                     movementInfo.BuildingId = dto.BuildingId;
                 }
@@ -130,33 +155,24 @@ namespace EmpMovementTracker.Services
         }
 
         // Delete the existing employee turnstile movement.
-        public async Task<ServiceResponse> Delete(int id)
+        public async Task Delete(int id)
         {
-            try
+            var existingEmpMovement = context.EmployeeMovements.Where(a => a.Id == id).FirstOrDefault();
+            context.EmployeeMovements.Remove(existingEmpMovement);
+            await context.SaveChangesAsync();
+
+            var any = context.EmployeeMovements
+                .Where(a => a.PersonId == existingEmpMovement.PersonId && a.Date == existingEmpMovement.Date)
+                .Any();
+
+            if (!any)
             {
-                var existingEmployeeMovement = context.EmployeeMovements.Where(a => a.Id == id).FirstOrDefault();
-                context.EmployeeMovements.Remove(existingEmployeeMovement);
+                var existingEmpTimeTracking = context.EmployeeTimeTrackings
+                    .Where(a => a.PersonId == existingEmpMovement.PersonId && a.Date == existingEmpMovement.Date)
+                    .FirstOrDefault();
+
+                context.EmployeeTimeTrackings.Remove(existingEmpTimeTracking);
                 await context.SaveChangesAsync();
-
-                var any = context.EmployeeMovements
-                    .Where(a => a.PersonId == existingEmployeeMovement.PersonId && a.Date == existingEmployeeMovement.Date)
-                    .Any();
-
-                if (!any)
-                {
-                    var existingEmployeeTimeTracking = context.EmployeeTimeTrackings
-                        .Where(a => a.PersonId == existingEmployeeMovement.PersonId && a.Date == existingEmployeeMovement.Date)
-                        .FirstOrDefault();
-
-                    context.EmployeeTimeTrackings.Remove(existingEmployeeTimeTracking);
-                    await context.SaveChangesAsync();
-                }
-
-                return new() { Success = true, Message = "The employee turnstile movement has been deleted" };
-            }
-            catch (Exception ex)
-            {
-                return new() { Success = false, Message = ex.Message };
             }
         }
     }

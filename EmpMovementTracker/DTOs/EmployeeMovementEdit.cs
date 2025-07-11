@@ -4,14 +4,15 @@ namespace EmpMovementTracker.DTOs;
 
 public partial class EmployeeMovementEdit
 {
-    [Required]
     public string PersonId { get; set; } = null!;
 
-    [Required]
     public string Name { get; set; } = null!;
 
-    [Required(ErrorMessage = "Date time is required")]
-    public DateTime DateTime { get; set; }
+    [Required(ErrorMessage = "Date is required")]
+    public DateTime? Date { get; set; }
+
+    [Required(ErrorMessage = "Time is required")]
+    public TimeSpan? Time { get; set; }
 
     [Required(ErrorMessage = "Station is required")]
     public string Station { get; set; } = null!;
