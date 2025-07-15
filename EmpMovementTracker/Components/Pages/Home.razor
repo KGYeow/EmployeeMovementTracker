@@ -1,5 +1,6 @@
 ﻿@page "/"
 
+@using EmpMovementTracker.Constants
 @using EmpMovementTracker.DTOs
 @using EmpMovementTracker.Models
 @using EmpMovementTracker.Services
@@ -10,7 +11,7 @@
 @inject ISnackbar Snackbar
 @inject NavigationManager Navigation
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Home - @AppConstant.AppTitle</PageTitle>
 
 <!-- Page Title-->
 <h2 class="mb-6 fw-bold">Present Employee Movement</h2>
@@ -42,19 +43,19 @@
                     <MudStack Row Wrap="Wrap.Wrap">
                         <MudItem Class="flex-grow-1">
                             <!-- Employee Name Filter -->
-                            <MudTextField @bind-Value="filter.Name" Variant="Variant.Text" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Rounded.Search" Placeholder="Search by employee name" />
+                            <MudTextField @bind-Value="filter.Name" Variant="Variant.Text" Margin="Margin.Dense" Typo="Typo.body2" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Rounded.Search" Placeholder="Search by employee name" />
                         </MudItem>
                         <div class="vr"></div>
-                        <MudItem Style="width: 150px">
+                        <MudItem Style="width: 120px">
                             <!-- Date Filter -->
-                            <MudDatePicker @bind-Date="filter.Date" Variant="Variant.Text" ShowToolbar="false" />
+                            <MudDatePicker @bind-Date="filter.Date" Variant="Variant.Text" Margin="Margin.Dense" ShowToolbar="false" IconSize="Size.Small" Style="font-size: 14px" />
                         </MudItem>
                         <div class="vr"></div>
-                        <MudItem Style="width: 200px">
+                        <MudItem Style="width: 180px">
                             <!-- Work Cell Filter -->
                             @if (filterOptions?.WorkCells != null)
                             {
-                                <MudSelect @bind-Value="filter.WorkCell" Variant="Variant.Text" Placeholder="Work cell">
+                                <MudSelect @bind-Value="filter.WorkCell" Variant="Variant.Text" Margin="Margin.Dense" Typo="Typo.body2" Placeholder="Work cell" Dense>
                                     @foreach (var workCell in filterOptions.WorkCells)
                                     {
                                         <MudSelectItem Value="workCell">@workCell</MudSelectItem>
@@ -67,11 +68,11 @@
                             }
                         </MudItem>
                         <div class="vr"></div>
-                        <MudItem Style="width: 200px">
+                        <MudItem Style="width: 180px">
                             <!-- Department Filter -->
                             @if (filterOptions?.Departments != null)
                             {
-                                <MudSelect @bind-Value="filter.Department" Variant="Variant.Text" Placeholder="Department" FitContent>
+                                <MudSelect @bind-Value="filter.Department" Variant="Variant.Text" Margin="Margin.Dense" Typo="Typo.body2" Placeholder="Department" Dense>
                                     @foreach (var department in filterOptions.Departments)
                                     {
                                         <MudSelectItem Value="department">@department</MudSelectItem>
@@ -146,7 +147,7 @@
                         <PropertyColumn Property="x => x.ShiftGroup" Title="Shift Group" />
                         <TemplateColumn StickyRight>
                             <CellTemplate>
-                                <MudStack Row>
+                                <MudStack Row Spacing="1">
                                     <MudIconButton
                                         Size="@Size.Small"
                                         Icon="@Icons.Material.Rounded.RemoveRedEye"

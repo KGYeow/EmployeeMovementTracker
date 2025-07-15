@@ -1,6 +1,4 @@
-﻿using MudBlazor;
-
-namespace EmpMovementTracker.DTOs;
+﻿namespace EmpMovementTracker.DTOs;
 
 public partial class EmployeeMovementFilterSelection
 {

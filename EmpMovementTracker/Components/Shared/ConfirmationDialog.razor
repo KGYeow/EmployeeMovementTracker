@@ -1,0 +1,28 @@
+﻿<MudDialog>
+    <TitleContent></TitleContent>
+    <DialogContent>
+        <MudStack Spacing="1" AlignItems="AlignItems.Center">
+            <div class="pa-2 rounded-circle" style="@($"background:{Colors.Gray.Lighten4}")">
+                <MudIcon Icon="@DialogIcon" Color="@DialogIconColor" Size="Size.Large" />
+            </div>
+            <MudText Typo="Typo.h6">@MudDialog.Title</MudText>
+            <MudText Typo="Typo.body1" Align="Align.Center">@ContentText</MudText>
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="@DialogIconColor" Variant="Variant.Filled" DropShadow="false" OnClick="Submit">@SubmitBtnText</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter] public string ContentText { get; set; } = null!;
+    [Parameter] public string SubmitBtnText { get; set; } = "Submit";
+    [Parameter] public string DialogIcon { get; set; } = Icons.Material.Rounded.Info;
+    [Parameter] public Color DialogIconColor { get; set; } = Color.Primary;
+
+    private void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    private void Cancel() => MudDialog.Cancel();
+}
