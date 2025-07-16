@@ -1,0 +1,66 @@
+﻿@page "/dashboard"
+
+@using EmpMovementTracker.Constants
+@using EmpMovementTracker.DTOs
+@using EmpMovementTracker.Models
+@using EmpMovementTracker.Services
+@using Microsoft.AspNetCore.WebUtilities;
+
+@inject EmployeeMovementService EmployeeMovementService
+@inject EmployeeTimeTrackingService EmployeeTimeTrackingService
+@inject ISnackbar Snackbar
+@inject NavigationManager Navigation
+
+<PageTitle>Dashboard - @AppConstant.AppTitle</PageTitle>
+
+<!-- Page Title-->
+<h2 class="mb-6 fw-bold">Dashboard</h2>
+
+<MudGrid>
+    <!-- Metrics Cards-->
+    <MudItem xs="12" sm="6">
+        <MudCard Elevation="25" Style="background: linear-gradient(40deg,rgb(4, 138, 179) 0%, rgb(255, 255, 255) 80%)">
+            <MudCardContent Class="text-white">
+                <h6 class="card-title mb-0" style="font-size: small">Total Employee</h6>
+                <p class="card-text fs-2 fw-bold">@dashboardData.TotalEmployee</p>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <MudCard Elevation="25" Style="background: linear-gradient(40deg,rgb(56, 178, 163) 0%, rgb(255, 255, 255) 80%)">
+            <MudCardContent Class="text-white">
+                <h6 class="card-title mb-0" style="font-size: small">Total Turnstile Access</h6>
+                <p class="card-text fs-2 fw-bold">@dashboardData.TotalTurnstileAccess</p>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
+
+@code {
+    // Variable declaration & initialization
+    private EmployeeMovementFilter filter = new (){ Date = DateTime.Parse("2021-6-13") };
+    private EmployeeMovementDashboard dashboardData = new();
+
+    // Action on component initialization
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            dashboardData = EmployeeMovementService.DashboardData(filter.Date);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("An error occurred while loading the page data. Please refresh the page or try again later.", Severity.Error);
+        }
+    }
+
+    // View the employee turnstile movement details
+    private void ViewPresentEmployeeMovement(DateOnly date)
+    {
+        var fullUrl = QueryHelpers.AddQueryString($"/presentEmployeeMovement", new Dictionary<string, string?>
+            {
+                ["Date"] = date.ToString("yyyy-MM-dd")
+            });
+        Navigation.NavigateTo(fullUrl, true);
+    }
+}

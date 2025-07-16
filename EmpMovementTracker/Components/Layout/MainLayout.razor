@@ -13,13 +13,13 @@
 <MudLayout>
     <!-- Topbar -->
     <MudAppBar Color="Color.Primary" ToolBarClass="gap-4">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudToggleIconButton Icon="@Icons.Material.Rounded.Menu" ToggledIcon="@Icons.Material.Rounded.MenuOpen" Color="Color.Inherit" Edge="Edge.Start" @bind-Toggled="drawerOpen" />
         <MudText Typo="Typo.h6">Employee Movement Tracker</MudText>
     </MudAppBar>
 
     <!-- Sidebar -->
-    <MudDrawer Class="py-3" Color="Color.Primary" ClipMode="DrawerClipMode.Always" @bind-Open="@drawerOpen">
-        <NavMenu />
+    <MudDrawer Class="py-2" Variant="@DrawerVariant.Mini" Color="Color.Primary" ClipMode="DrawerClipMode.Always" @bind-Open="@drawerOpen">
+        <NavMenu DrawerOpen="drawerOpen" />
     </MudDrawer>
 
     <!-- Main Content -->
@@ -31,19 +31,12 @@
     </MudMainContent>
 
     <!-- Footer -->
-    <MudAppBar Bottom Fixed="false" Color="Color.Primary" Elevation="0">
-        <MudItem>
-            &copy; @DateTime.Now.Year Jabil Inc.. All rights reserved.
-        </MudItem>
-    </MudAppBar>
+    <Footer />
 </MudLayout>
 
 @code {
     // Variable declaration & initialization
-    bool drawerOpen = false;
-
-    // Toggle the drawer to open/close
-    void DrawerToggle() => drawerOpen = !drawerOpen;
+    private bool drawerOpen = false;
     
     // Define custom theme
     MudTheme MyCustomTheme = new MudTheme()
@@ -54,6 +47,7 @@
             Secondary = "#9FA8DA",
             Tertiary = "#E8EAF6",
             Background = "#F5F5F5",
+            DrawerIcon = "#FFFFFF",
         }
     };
 }
