@@ -1,10 +1,11 @@
 ﻿@page "/employeeTurnstileMovement/{personId}"
 
-@using Microsoft.AspNetCore.WebUtilities;
+@using EmpMovementTracker.Constants
 @using EmpMovementTracker.DTOs
 @using EmpMovementTracker.Models
 @using EmpMovementTracker.Services
 @using EmpMovementTracker.Components.Shared
+@using Microsoft.AspNetCore.WebUtilities;
 
 @inject EmployeeMovementService EmployeeMovementService
 @inject EmployeeTimeTrackingService EmployeeTimeTrackingService
@@ -12,7 +13,7 @@
 @inject IDialogService DialogService
 @inject NavigationManager Navigation
 
-<PageTitle>Employee Turnstile Movement</PageTitle>
+<PageTitle>Employee Turnstile Movement - @AppConstant.AppTitle</PageTitle>
 
 <!-- Page Title-->
 <h2 class="mb-6 fw-bold">Employee Turnstile Movement</h2>
@@ -65,14 +66,14 @@
                     <MudStack Row Wrap="Wrap.Wrap">
                         <MudItem Class="flex-grow-1">
                             <!-- Station Filter -->
-                            <MudTextField @bind-Value="filter.Station" Variant="Variant.Text" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Rounded.Search" Placeholder="Search by station" />
+                            <MudTextField @bind-Value="filter.Station" Variant="Variant.Text" Margin="Margin.Dense" Typo="Typo.body2" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Rounded.Search" Placeholder="Search by station" />
                         </MudItem>
                         <div class="vr"></div>
                         <MudItem Style="width: 200px">
                             <!-- Work Cell Filter -->
                             @if (filterOptions?.BuildingIds != null)
                             {
-                                <MudSelect @bind-Value="filter.BuildingId" Variant="Variant.Text" Placeholder="Accessed Building ID">
+                                <MudSelect @bind-Value="filter.BuildingId" Variant="Variant.Text" Margin="Margin.Dense" Typo="Typo.body2" Placeholder="Accessed Building ID" Dense>
                                     @foreach (var buildingId in filterOptions.BuildingIds)
                                     {
                                         <MudSelectItem Value="buildingId">@buildingId</MudSelectItem>
@@ -132,7 +133,7 @@
                         <PropertyColumn Property="x => x.ShiftGroupId" Title="Shift Group ID"/>
                         <TemplateColumn StickyRight>
                             <CellTemplate>
-                                <MudStack Row>
+                                <MudStack Row Spacing="1">
                                     <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Rounded.Edit" title="Edit" OnClick="() => EditEmployeeTurnstileMovement(context.Item.Id)" />
                                     <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Rounded.Delete" title="Delete" OnClick="() => DeleteEmployeeTurnstileMovement(context.Item.Id)" />
                                 </MudStack>
@@ -214,12 +215,15 @@
     // Delete the employee turnstile movement (open the delete confirmation dialog)
     private async Task DeleteEmployeeTurnstileMovement(int itemId)
     {
-        var parameters = new DialogParameters<DeleteConfirmationDialog>
+        var parameters = new DialogParameters<ConfirmationDialog>
         {
             { x => x.ContentText, "Are you sure you want to delete the turnstile movement data for this employee? This action is permanent and cannot be undone." },
+            { x => x.SubmitBtnText, "Delete" },
+            { x => x.DialogIcon, Icons.Material.Rounded.Warning },
+            { x => x.DialogIconColor, Color.Error }
         };
         var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
-        var dialog = await DialogService.ShowAsync<DeleteConfirmationDialog>("Delete Confirmation", parameters, options);
+        var dialog = await DialogService.ShowAsync<ConfirmationDialog>("Delete Confirmation", parameters, options);
         var dialogResult = await dialog.Result;
 
         if (!dialogResult.Canceled)
