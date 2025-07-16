@@ -1,15 +1,15 @@
 ﻿<MudNavMenu Color="Color.Secondary" Class="@(DrawerOpen ? "px-2" : "")" Rounded Style="transition: all 200ms ease-in-out">
-    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Rounded.Home">
-        Home
-    </MudNavLink>
-    <MudNavLink Href="/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Rounded.Dashboard">
+    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Rounded.Dashboard" title="Dashboard">
         Dashboard
     </MudNavLink>
+    <MudNavLink Href="/dailyPresenceTimes" Match="NavLinkMatch.All" Icon="@Icons.Material.Rounded.AccessTime" title="Daily Presence Times">
+        Daily Presence Times
+    </MudNavLink>
     <MudNavGroup Title="Examples" Expanded="true" Icon="@Icons.Material.Rounded.Pages" HideExpandIcon="!DrawerOpen">
-        <MudNavLink Href="/example/counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Rounded.Calculate">
+        <MudNavLink Href="/example/counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Rounded.Calculate" title="Counter">
             Counter
         </MudNavLink>
-        <MudNavLink Href="/example/weather" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Rounded.WbSunny">
+        <MudNavLink Href="/example/weather" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Rounded.WbSunny" title="Weather">
             Weather
         </MudNavLink>
     </MudNavGroup>
