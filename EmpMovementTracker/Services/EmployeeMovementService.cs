@@ -3,6 +3,7 @@ using EmpMovementTracker.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace EmpMovementTracker.Services
 {
@@ -153,7 +154,67 @@ namespace EmpMovementTracker.Services
             context.EmployeeMovements.UpdateRange(movementList);
             await context.SaveChangesAsync();
         }
+        // GET: EmployeeMovement/Create
+        //public async Task<EmployeeMovementCreate> Create(EmployeeMovementCreate dto)
+        //{
+        //    await GetInitializedSelections();
+        //    return new EmployeeMovementCreate();
 
+        //}
+
+        // POST: EmployeeMovement/Create
+        public async Task Create(EmployeeMovementCreate dto)
+        {
+
+            var safeDate = dto.Date ?? DateTime.Today;
+            var safeTime = dto.Time ?? TimeSpan.Zero;
+            var safeDateTime = safeDate.Date + safeTime;
+            var newEmployee = new EmployeeMovement
+            {
+                PersonId = dto.PersonId,
+                Name = dto.Name,
+                Station = dto.Station,
+                WorkCell = dto.WorkCell,
+                DepartmentCode = dto.DepartmentCode,
+                Department = dto.Department,
+                ShiftGroupId = dto.ShiftGroupId,
+                ShiftGroup = dto.ShiftGroup,
+                BuildingId = dto.BuildingId,
+                Building = dto.Building,
+                DateTime = safeDateTime,
+                Date = DateOnly.FromDateTime(safeDateTime),
+                Time = TimeOnly.FromTimeSpan(dto.Time ?? TimeSpan.MinValue),
+
+            };
+
+            await context.EmployeeMovements.AddAsync(newEmployee);
+
+
+            // Check if a time tracking record already exists
+            var existingTimeTracking = await context.EmployeeTimeTrackings
+                .FirstOrDefaultAsync(t =>
+                    t.PersonId == dto.PersonId &&
+                    t.Date == DateOnly.FromDateTime(safeDate));
+
+            if (existingTimeTracking == null)
+            {
+                var newTimeTracking = new EmployeeTimeTracking
+                {
+                    PersonId = dto.PersonId,
+                    Name = dto.Name,
+                    Date = DateOnly.FromDateTime(safeDate),
+                    WorkCell = dto.WorkCell,
+                    Department = dto.Department,
+                    ShiftGroup = dto.ShiftGroup,
+                    Building = dto.Building
+                };
+
+                await context.EmployeeTimeTrackings.AddAsync(newTimeTracking);
+            }
+
+            await context.SaveChangesAsync();
+
+        }
         // Delete the existing employee turnstile movement.
         public async Task Delete(int id)
         {

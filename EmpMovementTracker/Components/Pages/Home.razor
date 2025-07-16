@@ -48,6 +48,7 @@
                         <MudItem Style="width: 150px">
                             <!-- Date Filter -->
                             <MudDatePicker @bind-Date="filter.Date" Variant="Variant.Text" ShowToolbar="false" />
+
                         </MudItem>
                         <div class="vr"></div>
                         <MudItem Style="width: 200px">
@@ -93,9 +94,10 @@
                         <div class="vr"></div>
                         <MudStack Row>
                             <!-- Add Employee Turnstile Movement Button -->
-                            <MudButton IconClass="me-1" StartIcon="@Icons.Material.Rounded.Add" Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" DropShadow="false" Href="/EmployeeMovement/Create" title="Add Employee Turnstile Movement">
+                            <MudButton IconClass="me-1" StartIcon="@Icons.Material.Rounded.Add" Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" DropShadow="false" Href="/employeeTurnstileMovement/create" title="Add Employee Turnstile Movement">
                                 Insert
                             </MudButton>
+                            @* <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Rounded.Edit" title="Edit" OnClick="() => EditEmployeeTurnstileMovement(context.Item.Id)" /> *@
                         </MudStack>
                     </MudStack>
                 </EditForm>

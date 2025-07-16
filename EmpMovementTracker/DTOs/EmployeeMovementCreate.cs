@@ -13,6 +13,12 @@ public partial class EmployeeMovementCreate
     [Required(ErrorMessage = "Date time is required")]
     public DateTime DateTime { get; set; }
 
+    [Required(ErrorMessage = "Date is required")]
+    public DateTime? Date { get; set; }
+
+    [Required(ErrorMessage = "Time is required")]
+    public TimeSpan? Time { get; set; }
+
     [Required(ErrorMessage = "Station is required")]
     public string Station { get; set; } = null!;
 
