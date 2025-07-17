@@ -1,5 +1,6 @@
 ﻿@page "/employeeTurnstileMovement/create"
 
+@using EmpMovementTracker.Components.Shared
 @using EmpMovementTracker.DTOs
 @using EmpMovementTracker.Services
 @using System.ComponentModel.DataAnnotations
@@ -7,6 +8,7 @@
 
 @inject EmployeeMovementService EmployeeMovementService
 @inject ISnackbar Snackbar
+@inject IDialogService DialogService
 @inject NavigationManager Navigation
 
 <PageTitle>Add Employee Turnstile Movement</PageTitle>
@@ -19,128 +21,100 @@
     <MudItem xs="12">
         <MudCard Elevation="25">
             <EditForm FormName="EmployeeMovementAddForm" Model="@createEmployeeMovement" OnValidSubmit="CreateEmployeeTurnstileMovement">
-                <MudCardContent Class="d-flex flex-column gap-4">
-                    <DataAnnotationsValidator />
-                    <div>
-                        <!-- Turnstile Access Details -->
-                        <MudText Typo="Typo.body1" Class="fw-bold mb-1">Turnstile Information</MudText>
-                         <MudGrid>
-                            <!-- Date -->
-                            <MudItem xs="12" sm="3">
-                                <MudInputLabel>Date *</MudInputLabel>
-                                <MudDatePicker @bind-Date="createEmployeeMovement.Date" DateFormat="dd/MM/yyyy" Editable="true" For="@(() => createEmployeeMovement.Date)" />
-                            </MudItem>
-                            <!-- Time -->
-                            <MudItem xs="12" sm="3">
-                                <MudInputLabel>Time *</MudInputLabel>
-                                <MudTimePicker @bind-Time="createEmployeeMovement.Time" TimeFormat="hh:mm:ss tt" AmPm="true" Editable="true" For="@(() => createEmployeeMovement.Time)" />
-                            </MudItem>
-                            <!-- Accessed Building ID -->
-                            <MudItem xs="12" sm="3">
-                                <MudInputLabel>Building ID *</MudInputLabel>
-                                <MudAutocomplete T="string" @bind-Value="createEmployeeMovement.BuildingId" SearchFunc="filterOptions.SearchBuildingId" MaxItems="null" For="@(() => createEmployeeMovement.BuildingId)" Dense>
-                                    <NoItemsTemplate>
-                                        <MudText Align="Align.Center" Class="px-4 py-1">
-                                            No items found
-                                        </MudText>
-                                    </NoItemsTemplate>
-                                </MudAutocomplete>
-                            </MudItem>
-                            <!-- Station -->
-                            <MudItem xs="12" sm="3">
-                                <MudInputLabel>Station *</MudInputLabel>
-                                <MudTextField T="string" @bind-Value="createEmployeeMovement.Station" For="@(() => createEmployeeMovement.Station)" />
-                            </MudItem>
-                         </MudGrid>
-                        <MudText Typo="Typo.body1" Class="fw-bold mb-1"></MudText>
-                        <!-- Employee Information -->
-                        <MudText Typo="Typo.body1" Class="fw-bold mb-1">Employee Information</MudText>
-                        <MudGrid>
-                            <!-- Employee Name -->
-                            <MudItem xs="12" sm="3">
-                                <MudInputLabel>Name *</MudInputLabel>
-                                <MudTextField T="string" @bind-Value="createEmployeeMovement.Name" For="@(() => createEmployeeMovement.Name)" />
-                            </MudItem>
-                            <!-- Employee ID -->
-                            <MudItem xs="12" sm="3">
-                                <MudInputLabel>Employee ID *</MudInputLabel>
-                                <MudTextField T="string" @bind-Value="createEmployeeMovement.PersonId" For="@(() => createEmployeeMovement.PersonId)" />
-                            </MudItem>
-                            <!-- Work Cell -->
-                            <MudItem xs="12" sm="3">
-                                <MudInputLabel>Work Cell *</MudInputLabel>
-                                <MudAutocomplete T="string" @bind-Value="createEmployeeMovement.WorkCell" SearchFunc="filterOptions.SearchWorkCell" MaxItems="null" For="@(() => createEmployeeMovement.WorkCell)" Dense>
-                                    <NoItemsTemplate>
-                                        <MudText Align="Align.Center" Class="px-4 py-1">
-                                            No items found
-                                        </MudText>
-                                    </NoItemsTemplate>
-                                </MudAutocomplete>
-                            </MudItem>
-                            <!-- Shift Group ID -->
-                            <MudItem xs="12" sm="3">
-                                <MudInputLabel>Shift Group ID *</MudInputLabel>
-                                <MudAutocomplete T="string" @bind-Value="createEmployeeMovement.ShiftGroupId" SearchFunc="filterOptions.SearchShiftGroupId" MaxItems="null" For="@(() => createEmployeeMovement.ShiftGroupId)" Dense>
-                                    <NoItemsTemplate>
-                                        <MudText Align="Align.Center" Class="px-4 py-1">
-                                            No items found
-                                        </MudText>
-                                    </NoItemsTemplate>
-                                </MudAutocomplete>
-                            </MudItem>
-                            <!-- Shift Group -->
-                            <MudItem xs="12" sm="3">
-                                <MudInputLabel>Shift Group *</MudInputLabel>
-                                <MudNumericField @bind-Value="createEmployeeMovement.ShiftGroup" Min="0" For="@(() => createEmployeeMovement.ShiftGroup)" />
-                            </MudItem>
-                            <!-- Department Code -->
-                            <MudItem xs="12" sm="3">
-                                <MudInputLabel>Department Code *</MudInputLabel>
-                                <MudAutocomplete T="string" @bind-Value="createEmployeeMovement.DepartmentCode" SearchFunc="filterOptions.SearchDepartmentCode" MaxItems="null" For="@(() => createEmployeeMovement.DepartmentCode)" Dense>
-                                    <NoItemsTemplate>
-                                        <MudText Align="Align.Center" Class="px-4 py-1">
-                                            No items found
-                                        </MudText>
-                                    </NoItemsTemplate>
-                                </MudAutocomplete>
-                            </MudItem>
-                            <!-- Department -->
-                            <MudItem xs="12" sm="3">
-                                <MudInputLabel>Department *</MudInputLabel>
-                                <MudAutocomplete T="string" @bind-Value="createEmployeeMovement.Department" SearchFunc="filterOptions.SearchDepartment" MaxItems="null" For="@(() => createEmployeeMovement.Department)" Dense>
-                                    <NoItemsTemplate>
-                                        <MudText Align="Align.Center" Class="px-4 py-1">
-                                            No items found
-                                        </MudText>
-                                    </NoItemsTemplate>
-                                </MudAutocomplete>
-                            </MudItem>
-                            <!-- Building -->
-                            <MudItem xs="12" sm="3">
-                                <MudInputLabel>Building *</MudInputLabel>
-                                <MudAutocomplete T="string" @bind-Value="createEmployeeMovement.Building" SearchFunc="filterOptions.SearchBuilding" MaxItems="null" For="@(() => createEmployeeMovement.Building)" Dense>
-                                    <NoItemsTemplate>
-                                        <MudText Align="Align.Center" Class="px-4 py-1">
-                                            No items found
-                                        </MudText>
-                                    </NoItemsTemplate>
-                                </MudAutocomplete>
-                            </MudItem>
-
-                        </MudGrid>
-                    </div>
-                    <MudDivider />
-                </MudCardContent>
-                <MudCardActions Class="justify-content-end gap-2">
-                    <!-- Cancel Button -->
-                    @* <MudButton Color="Color.Primary" title="Cancel" OnClick="() => CancelEditEmployeeTurnstileMovement()">
-                        Cancel
-                    </MudButton> *@
-                    <!-- Submit Button -->
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" DropShadow="false" title="Submit">
-                        Submit
-                    </MudButton>
-                </MudCardActions>
+                <!-- Employee Information Section -->
+                <MudPaper Class="pa-4" Elevation="1">
+                    <MudText Typo="Typo.h6" Class="mb-2">Employee Information</MudText>
+                    <MudGrid>
+                        <MudItem xs="12" sm="6">
+                            <MudInputLabel>Name *</MudInputLabel>
+                            <MudTextField @bind-Value="createEmployeeMovement.Name" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
+                        </MudItem>
+                        <MudItem xs="12" sm="6">
+                            <MudInputLabel>Employee ID *</MudInputLabel>
+                            <MudTextField @bind-Value="createEmployeeMovement.PersonId" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudInputLabel>Work Cell *</MudInputLabel>
+                            <MudTextField @bind-Value="createEmployeeMovement.WorkCell" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudInputLabel>Shift Group ID *</MudInputLabel>
+                            <MudSelect T="string" @bind-Value="createEmployeeMovement.ShiftGroupId" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true">
+                                @foreach (var item in filterOptions.ShiftGroupIds)
+                                {
+                                    <MudSelectItem Value="@item">@item</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudInputLabel>Shift Group *</MudInputLabel>
+                            <MudNumericField @bind-Value="createEmployeeMovement.ShiftGroup" Variant="Variant.Outlined" Margin="Margin.Dense" Typo="Typo.body2" Min="0" For="@(() => createEmployeeMovement.ShiftGroup)" />
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudInputLabel>Department Code *</MudInputLabel>
+                            <MudSelect T="string" @bind-Value="createEmployeeMovement.DepartmentCode" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true">
+                                @foreach (var item in filterOptions.DepartmentCodes)
+                                {
+                                    <MudSelectItem Value="@item">@item</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudInputLabel>Department *</MudInputLabel>
+                            <MudSelect T="string" @bind-Value="createEmployeeMovement.Department" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true">
+                                @foreach (var item in filterOptions.Departments)
+                                {
+                                    <MudSelectItem Value="@item">@item</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudInputLabel>Building *</MudInputLabel>
+                            <MudSelect T="string" @bind-Value="createEmployeeMovement.Building" Variant="Variant.Outlined" Margin="Margin.Dense"  Required="true">
+                                @foreach (var item in filterOptions.Buildings)
+                                {
+                                    <MudSelectItem Value="@item">@item</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                    </MudGrid>
+                    <!-- Turnstile Information Section -->
+                    <MudText Typo="Typo.h6" Class="mb-2">Turnstile Information</MudText>
+                    <MudGrid>
+                        <MudItem xs="12" sm="6">
+                            <MudInputLabel>Date *</MudInputLabel>
+                            <MudDatePicker @bind-Date="createEmployeeMovement.Date" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
+                        </MudItem>
+                        <MudItem xs="12" sm="6">
+                            <MudInputLabel>Time *</MudInputLabel>
+                            <MudTimePicker @bind-Time="createEmployeeMovement.Time" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
+                        </MudItem>
+                        <MudItem xs="12" sm="6">
+                            <MudInputLabel>Building ID *</MudInputLabel>
+                            <MudSelect T="string" @bind-Value="createEmployeeMovement.BuildingId" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true">
+                                @foreach (var item in filterOptions.BuildingIds)
+                                {
+                                    <MudSelectItem Value="@item">@item</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="12" sm="6">
+                            <MudInputLabel>Station *</MudInputLabel>
+                            <MudTextField @bind-Value="createEmployeeMovement.Station" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
+                        </MudItem>
+                    </MudGrid>
+                    <!-- Action Buttons -->
+                    <MudCardActions Class="justify-content-end gap-2">
+                        <!-- Cancel Button -->
+                        <MudButton Color="Color.Primary" title="Cancel" OnClick="() => CancelEditEmployeeTurnstileMovement()">
+                            Cancel
+                        </MudButton>
+                        <!-- Submit Button -->
+                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" DropShadow="false" title="Submit">
+                            Submit
+                        </MudButton>
+                    </MudCardActions>
+                </MudPaper>
             </EditForm>
         </MudCard>
     </MudItem>
@@ -149,7 +123,7 @@
 @code {
 
     // Variable declaration & initialization
-   // private bool isFormLoading = true;
+    // private bool isFormLoading = true;
     private EmployeeMovementFilterSelection filterOptions = new();
     private EmployeeMovementCreate createEmployeeMovement = new();
     private MudForm form = null!;
@@ -170,54 +144,52 @@
         //await LoadFormData();
     }
 
-    // Load the form data
-    // private async Task LoadFormData()
-    // {
-    //     isFormLoading = true;
-    //     try
-    //     {
-    //         createEmployeeMovement = await EmployeeMovementService.Edit(EmployeeMovementId);
-    //     }
-    //     catch (Exception)
-    //     {
-    //         Snackbar.Add("An unexpected error occurred while loading employee turnstile movement data. Please try again.", Severity.Error);
-    //     }
-    //     isFormLoading = false;
-    // }
-
     // Add the employee turnstile movement
     private async Task CreateEmployeeTurnstileMovement()
     {
-        try
-        {
-            // Update the employee turnstile movement
-            await EmployeeMovementService.Create(createEmployeeMovement);
-            Snackbar.Add("The employee has been added.", Severity.Success);
-        }
-        catch (Exception ex)
-        {
-            //Snackbar.Add("An unexpected error occurred while add employee turnstile movement data. Please try again.", Severity.Error);
 
-            var innerMessage = ex.InnerException?.Message ?? ex.Message;
-            Snackbar.Add($"An unexpected error occurred: {innerMessage}", Severity.Error);
+        var parameters = new DialogParameters<ConfirmationDialog>
+        {
+            { x => x.ContentText, "Are you sure you want to submit?" },
+            { x => x.SubmitBtnText, "Confirm" },
+        };
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+        var dialog = await DialogService.ShowAsync<ConfirmationDialog>("Submit Confirmation. The employee has been added.", parameters, options);
+        var dialogResult = await dialog.Result;
 
+        if (!dialogResult.Canceled)
+        {
+            try
+            {
+                await CreateEmployeeTurnstileMovement();
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add("An unexpected error occurred while add employee turnstile movement data. Please try again.", Severity.Error);
+                // var innerMessage = ex.InnerException?.Message ?? ex.Message;
+                // Snackbar.Add($"An unexpected error occurred: {innerMessage}", Severity.Error);
+            }
         }
     }
 
     // Cancel editing the employee turnstile movement
-    // private void CancelEditEmployeeTurnstileMovement()
-    // {
-    //     if (!string.IsNullOrWhiteSpace(PersonId))
-    //     {
-    //         var fullUrl = QueryHelpers.AddQueryString($"/employeeTurnstileMovement/{PersonId}", new Dictionary<string, string?>
-    //         {
-    //             ["Date"] = Date.ToString("yyyy-MM-dd")
-    //         });
-    //         Navigation.NavigateTo(fullUrl, true);
-    //     }
-    //     else
-    //     {
-    //         Snackbar.Add("Navigation failed: Missing employee ID. Please return manually.", Severity.Warning);
-    //     }
-    // }
+    private async Task CancelEditEmployeeTurnstileMovement()
+    {
+    
+        var parameters = new DialogParameters<ConfirmationDialog>
+        {
+            { x => x.ContentText, "Are you sure you want to cancel?" },
+            { x => x.SubmitBtnText, "Yes" },
+        };
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+        var dialog = await DialogService.ShowAsync<ConfirmationDialog>("Cancel Confirmation", parameters, options);
+        var dialogResult = await dialog.Result;
+
+        if (!dialogResult.Canceled)
+        {
+            createEmployeeMovement = new EmployeeMovementCreate(); // Reset the form
+            StateHasChanged(); // Refresh the UI
+        }
+
+    }
 }
