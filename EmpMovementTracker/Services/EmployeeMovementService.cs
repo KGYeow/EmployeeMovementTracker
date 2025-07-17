@@ -141,13 +141,6 @@ namespace EmpMovementTracker.Services
             context.EmployeeMovements.UpdateRange(movementList);
             await context.SaveChangesAsync();
         }
-        // GET: EmployeeMovement/Create
-        //public async Task<EmployeeMovementCreate> Create(EmployeeMovementCreate dto)
-        //{
-        //    await GetInitializedSelections();
-        //    return new EmployeeMovementCreate();
-
-        //}
 
         // POST: EmployeeMovement/Create
         public async Task Create(EmployeeMovementCreate dto)
@@ -176,12 +169,13 @@ namespace EmpMovementTracker.Services
 
             await context.EmployeeMovements.AddAsync(newEmployee);
 
-
             // Check if a time tracking record already exists
             var existingTimeTracking = await context.EmployeeTimeTrackings
                 .FirstOrDefaultAsync(t =>
                     t.PersonId == dto.PersonId &&
                     t.Date == DateOnly.FromDateTime(safeDate));
+
+            var movementTime = TimeOnly.FromTimeSpan(dto.Time ?? TimeSpan.Zero);
 
             if (existingTimeTracking == null)
             {
@@ -193,10 +187,22 @@ namespace EmpMovementTracker.Services
                     WorkCell = dto.WorkCell,
                     Department = dto.Department,
                     ShiftGroup = dto.ShiftGroup,
-                    Building = dto.Building
+                    Building = dto.Building,
+                    InitialTime = TimeOnly.FromTimeSpan(dto.Time ?? TimeSpan.Zero),
+                    FinalTime = TimeOnly.FromTimeSpan(dto.Time ?? TimeSpan.Zero)
+
                 };
 
                 await context.EmployeeTimeTrackings.AddAsync(newTimeTracking);
+            }
+            else
+            {
+                // Update InitialTime and FinalTime if needed
+                if (existingTimeTracking.InitialTime == default || movementTime < existingTimeTracking.InitialTime)
+                    existingTimeTracking.InitialTime = movementTime;
+
+                if (existingTimeTracking.FinalTime == default || movementTime > existingTimeTracking.FinalTime)
+                    existingTimeTracking.FinalTime = movementTime;
             }
 
             await context.SaveChangesAsync();
