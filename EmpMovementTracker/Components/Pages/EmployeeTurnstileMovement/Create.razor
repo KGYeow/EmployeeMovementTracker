@@ -17,11 +17,12 @@
 <h2 class="mb-6 fw-bold">Add Employee Turnstile Movement</h2>
 
 <MudGrid>
-    <!-- Add Employee Turnstile Movement Form -->
+    <!-- Employee Turnstile Movement Edit Form -->
     <MudItem xs="12">
         <MudCard Elevation="25">
-            <EditForm FormName="EmployeeMovementAddForm" Model="@createEmployeeMovement" OnValidSubmit="CreateEmployeeTurnstileMovement">
+            <EditForm FormName="EmployeeMovementEditForm" Model="@createEmployeeMovement" OnValidSubmit="CreateEmployeeTurnstileMovement">
                 <MudCardContent Class="d-flex flex-column gap-4">
+                    <DataAnnotationsValidator />
                     <!-- Employee Information -->
                     <div>
                         <MudText Typo="Typo.body1" Class="fw-bold mb-1">Employee Information</MudText>
@@ -133,7 +134,7 @@
                 </MudCardContent>
                 <MudCardActions Class="justify-content-end gap-2">
                     <!-- Cancel Button -->
-                    <MudButton Color="Color.Primary" title="Cancel" OnClick="() => CancelEditEmployeeTurnstileMovement()">
+                    <MudButton Color="Color.Primary" title="Cancel" OnClick="() => CancelCreateEmployeeTurnstileMovement()">
                         Cancel
                     </MudButton>
                     <!-- Submit Button -->
@@ -147,7 +148,6 @@
 </MudGrid>
 
 @code {
-
     // Variable declaration & initialization
     private EmployeeMovementFilterSelection filterOptions = new();
     private EmployeeMovementCreate createEmployeeMovement = new();
@@ -164,42 +164,15 @@
         {
             Snackbar.Add("An error occurred while loading the page data. Please refresh the page or try again later.", Severity.Error);
         }
+
+ 
     }
 
-    // Add the employee turnstile movement
-    private async Task CreateEmployeeTurnstileMovement()
-    {
-
-        var parameters = new DialogParameters<ConfirmationDialog>
-        {
-            { x => x.ContentText, "Are you sure you want to submit?" },
-            { x => x.SubmitBtnText, "Confirm" },
-        };
-        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
-        var dialog = await DialogService.ShowAsync<ConfirmationDialog>("Submit Confirmation!", parameters, options);
-        var dialogResult = await dialog.Result;
-
-        if (!dialogResult.Canceled)
-        {
-            try
-            {
-                await EmployeeMovementService.Create(createEmployeeMovement);
-                createEmployeeMovement = new EmployeeMovementCreate(); //Reset the form
-                StateHasChanged(); //Refresh the UI
-            }
-            catch (Exception ex)
-            {
-                //Snackbar.Add("An unexpected error occurred while add employee turnstile movement data. Please try again.", Severity.Error);
-                var innerMessage = ex.InnerException?.Message ?? ex.Message;
-                Snackbar.Add($"An unexpected error occurred: {innerMessage}", Severity.Error);
-            }
-        }
-    }
 
     // Cancel editing the employee turnstile movement
-    private async Task CancelEditEmployeeTurnstileMovement()
+    private async Task CancelCreateEmployeeTurnstileMovement()
     {
-    
+
         var parameters = new DialogParameters<ConfirmationDialog>
         {
             { x => x.ContentText, "Are you sure you want to cancel?" },
@@ -215,5 +188,35 @@
             StateHasChanged(); //Refresh the UI
         }
 
+    }
+
+
+    // Update the employee turnstile movement (open the update confirmation dialog)
+    private async Task CreateEmployeeTurnstileMovement()
+    {
+        var parameters = new DialogParameters<ConfirmationDialog>
+        {
+            { x => x.ContentText, "Are you sure you want to submit changes?" },
+            { x => x.SubmitBtnText, "Confirm" },
+        };
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+        var dialog = await DialogService.ShowAsync<ConfirmationDialog>("Submit Confirmation", parameters, options);
+        var dialogResult = await dialog.Result;
+
+        if (!dialogResult.Canceled)
+        {
+            try
+            {
+                // Update the employee turnstile movement
+                await EmployeeMovementService.Create(createEmployeeMovement);
+                createEmployeeMovement = new EmployeeMovementCreate(); //Reset the form
+                StateHasChanged(); //Refresh the UI
+                Snackbar.Add("The employee turnstile movement has been updated.", Severity.Success);
+            }
+            catch (Exception)
+            {
+                Snackbar.Add("An unexpected error occurred while updating employee turnstile movement data. Please try again.", Severity.Error);
+            }
+        }
     }
 }
