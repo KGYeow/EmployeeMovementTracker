@@ -1,4 +1,4 @@
-﻿using EmpMovementTracker.DTOs;
+﻿using EmpMovementTracker.DTOs.EmployeeTurnstileMovement;
 using EmpMovementTracker.Models;
 using Microsoft.EntityFrameworkCore;
 

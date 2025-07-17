@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace EmpMovementTracker.DTOs;
+namespace EmpMovementTracker.DTOs.EmployeeTurnstileMovement;
 
 public partial class EmployeeMovementCreate
 {

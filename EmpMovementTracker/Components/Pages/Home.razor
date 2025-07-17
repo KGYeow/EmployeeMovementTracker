@@ -1,8 +1,8 @@
 ﻿@page "/"
 
-@using EmpMovementTracker.Components.Shared
+@using EmpMovementTracker.Components.Shared.Dashboard
 @using EmpMovementTracker.Constants
-@using EmpMovementTracker.DTOs
+@using EmpMovementTracker.DTOs.Dashboard
 @using EmpMovementTracker.Services
 @using Microsoft.AspNetCore.WebUtilities;
 
@@ -17,33 +17,55 @@
 
 <MudGrid>
     <!-- Key Metrics Cards -->
-    <MudItem xs="12" sm="6">
-        <MudCard Elevation="25" Style="background: linear-gradient(40deg,rgb(4, 138, 179) 0%, rgb(255, 255, 255) 80%)">
+    <MudItem xs="12" sm="4">
+        <MudCard Elevation="25" Style="background: linear-gradient(40deg,rgb(0, 121, 107) 0%, rgb(128, 203, 196) 80%)">
             <MudCardContent Class="text-white">
-                <h6 class="card-title mb-0" style="font-size: small">Total Employee</h6>
-                <p class="card-text fs-2 fw-bold">@keyMetricsData.TotalEmployee</p>
+                <MudText Typo="Typo.caption">Total Employee Present</MudText>
+                <MudText Typo="Typo.h5" Class="fw-bold">@keyMetricsData.TotalEmployee</MudText>
             </MudCardContent>
         </MudCard>
     </MudItem>
-    <MudItem xs="12" sm="6">
-        <MudCard Elevation="25" Style="background: linear-gradient(40deg,rgb(56, 178, 163) 0%, rgb(255, 255, 255) 80%)">
+    <MudItem xs="12" sm="4">
+        <MudCard Elevation="25" Style="background: linear-gradient(40deg,rgb(0, 151, 167) 0%, rgb(128, 222, 234) 80%)">
             <MudCardContent Class="text-white">
-                <h6 class="card-title mb-0" style="font-size: small">Total Turnstile Access</h6>
-                <p class="card-text fs-2 fw-bold">@keyMetricsData.TotalTurnstileAccess</p>
+                <MudText Typo="Typo.caption">Total Turnstile Access</MudText>
+                <MudText Typo="Typo.h5" Class="fw-bold">@keyMetricsData.TotalTurnstileAccess</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" sm="4">
+        <MudCard Elevation="25" Style="background: linear-gradient(45deg,rgb(194, 24, 91) 0%, rgb(244, 143, 177) 80%)">
+            <MudCardContent Class="text-white">
+                <MudText Typo="Typo.caption">Peak Hour</MudText>
+                <MudText Typo="Typo.h5" Class="fw-bold">@keyMetricsData.PeakHour</MudText>
             </MudCardContent>
         </MudCard>
     </MudItem>
 
-    <!-- Turnstile Activity Timeline Chart -->
-    <MudItem xs="12">
+    <!-- Daily Turnstile Activity Timeline Chart -->
+    <MudItem xs="12" sm="6">
         <MudCard Elevation="25">
             <MudCardHeader Class="pb-0">
                 <CardHeaderContent>
-                    <MudText Typo="Typo.body1" Class="fw-bold">Turnstile Activity Timeline</MudText>
+                    <MudText Typo="Typo.body1" Class="fw-bold">Daily Turnstile Activity Timeline</MudText>
                 </CardHeaderContent>
             </MudCardHeader>
             <MudCardContent>
-                <MovementTimeSeries TimelineData="turnstileActivityTimelineData" />
+                <TurnstileActivityTimeline TimelineData="turnstileActivityTimelineData" />
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+
+    <!-- Daily Turnstile Movement by Building Chart -->
+    <MudItem xs="12" sm="6">
+        <MudCard Elevation="25">
+            <MudCardHeader Class="pb-0">
+                <CardHeaderContent>
+                    <MudText Typo="Typo.body1" Class="fw-bold">Daily Turnstile Movement by Building</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <TurnstileMovementBarChart ChartData="turnstileMovementEachBuildingData" />
             </MudCardContent>
         </MudCard>
     </MudItem>
@@ -52,8 +74,9 @@
 @code {
     // Variable declaration & initialization
     private DateTime dateTimeToday = DateTime.Parse("2021-6-13");
-    private EmployeeMovementDashboard keyMetricsData = new();
+    private DashboardKeyMetrics keyMetricsData = new();
     private List<TimeSeriesChartSeries.TimeValue> turnstileActivityTimelineData = [];
+    private Dictionary<string, double> turnstileMovementEachBuildingData = [];
 
     // Action on component initialization
     protected override async Task OnInitializedAsync()
@@ -63,21 +86,12 @@
             var dateToday = DateOnly.FromDateTime(dateTimeToday);
 
             keyMetricsData = await DashboardService.KeyMetricsData(dateToday);
-            turnstileActivityTimelineData = await DashboardService.TurnstileMovementOverTime(dateToday);
+            turnstileActivityTimelineData = await DashboardService.TurnstileActivityOverTime(dateToday);
+            turnstileMovementEachBuildingData = await DashboardService.TurnstileMovementEachBuilding(dateToday);
         }
         catch (Exception)
         {
             Snackbar.Add("An error occurred while loading the page data. Please refresh the page or try again later.", Severity.Error);
         }
-    }
-
-    // View the employee turnstile movement details
-    private void ViewPresentEmployeeMovement(DateOnly date)
-    {
-        var fullUrl = QueryHelpers.AddQueryString($"/presentEmployeeMovement", new Dictionary<string, string?>
-            {
-                ["Date"] = date.ToString("yyyy-MM-dd")
-            });
-        Navigation.NavigateTo(fullUrl, true);
     }
 }

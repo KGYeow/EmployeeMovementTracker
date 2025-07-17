@@ -1,12 +1,24 @@
 ﻿@inject ISnackbar Snackbar
 
 <MudTimeSeriesChart
+    Class="turnstileActivityTimeline"
     ChartSeries="series"
-    ChartOptions="options"
-    TimeLabelSpacing="TimeSpan.FromMinutes(30)"
+    ChartOptions="chartOptions"
+    AxisChartOptions="axisChartOptions"
+    TimeLabelSpacing="TimeSpan.FromMinutes(60)"
+    TimeLabelFormat="HH:mm tt"
     DataMarkerTooltipTimeLabelFormat="HH:mm tt"
     Width="100%"
-/>
+    Height="200px"
+>
+    <CustomGraphics>
+        <style>
+            .turnstileActivityTimeline text {
+                font-size: xx-small;
+            }
+        </style>
+    </CustomGraphics>
+</MudTimeSeriesChart>
 
 @code {
     [Parameter] public List<TimeSeriesChartSeries.TimeValue> TimelineData { get; set; } = [];
@@ -14,12 +26,14 @@
     // Variable declaration & initialization
     private List<TimeSeriesChartSeries> series = new();
     private TimeSeriesChartSeries chart = new();
-    private ChartOptions options = new ChartOptions
+    private AxisChartOptions axisChartOptions = new AxisChartOptions
+    {
+        MatchBoundsToSize = true,
+    };
+    private ChartOptions chartOptions = new ChartOptions
     {
         YAxisLines = false,
-        YAxisTicks = 50,
-        MaxNumYAxisTicks = 10,
-        YAxisRequireZeroPoint = true,
+        YAxisTicks = 100,
         LineStrokeWidth = 1,
         ShowLegend = false,
     };
@@ -37,7 +51,7 @@
                 Index = 0,
                 Data = TimelineData,
                 IsVisible = true,
-                LineDisplayType = LineDisplayType.Line,
+                LineDisplayType = LineDisplayType.Area,
                 DataMarkerTooltipTitleFormat = "{{X_VALUE}}",
                 DataMarkerTooltipSubtitleFormat = "Turnstile Access Count: {{Y_VALUE}}"
             };
