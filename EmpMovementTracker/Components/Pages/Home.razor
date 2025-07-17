@@ -1,28 +1,27 @@
 ﻿@page "/"
 
+@using EmpMovementTracker.Components.Shared
 @using EmpMovementTracker.Constants
 @using EmpMovementTracker.DTOs
-@using EmpMovementTracker.Models
 @using EmpMovementTracker.Services
 @using Microsoft.AspNetCore.WebUtilities;
 
-@inject EmployeeMovementService EmployeeMovementService
-@inject EmployeeTimeTrackingService EmployeeTimeTrackingService
+@inject DashboardService DashboardService
 @inject ISnackbar Snackbar
 @inject NavigationManager Navigation
 
-<PageTitle>Home - @AppConstant.AppTitle</PageTitle>
+<PageTitle>Dashboard - @AppConstant.AppTitle</PageTitle>
 
 <!-- Page Title-->
-<h2 class="mb-6 fw-bold">Present Employee Movement</h2>
+<h2 class="mb-6 fw-bold">Dashboard</h2>
 
 <MudGrid>
-    <!-- Metrics Cards-->
+    <!-- Key Metrics Cards -->
     <MudItem xs="12" sm="6">
         <MudCard Elevation="25" Style="background: linear-gradient(40deg,rgb(4, 138, 179) 0%, rgb(255, 255, 255) 80%)">
             <MudCardContent Class="text-white">
                 <h6 class="card-title mb-0" style="font-size: small">Total Employee</h6>
-                <p class="card-text fs-2 fw-bold">@dashboardData.TotalEmployee</p>
+                <p class="card-text fs-2 fw-bold">@keyMetricsData.TotalEmployee</p>
             </MudCardContent>
         </MudCard>
     </MudItem>
@@ -30,139 +29,21 @@
         <MudCard Elevation="25" Style="background: linear-gradient(40deg,rgb(56, 178, 163) 0%, rgb(255, 255, 255) 80%)">
             <MudCardContent Class="text-white">
                 <h6 class="card-title mb-0" style="font-size: small">Total Turnstile Access</h6>
-                <p class="card-text fs-2 fw-bold">@dashboardData.TotalTurnstileAccess</p>
+                <p class="card-text fs-2 fw-bold">@keyMetricsData.TotalTurnstileAccess</p>
             </MudCardContent>
         </MudCard>
     </MudItem>
 
-    <!-- Filter Section -->
+    <!-- Turnstile Activity Timeline Chart -->
     <MudItem xs="12">
         <MudCard Elevation="25">
+            <MudCardHeader Class="pb-0">
+                <CardHeaderContent>
+                    <MudText Typo="Typo.body1" Class="fw-bold">Turnstile Activity Timeline</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
             <MudCardContent>
-                <EditForm FormName="EmployeeTimeTrackingFilterForm" Model="@filter" OnValidSubmit="ApplyFilter">
-                    <MudStack Row Wrap="Wrap.Wrap">
-                        <MudItem Class="flex-grow-1">
-                            <!-- Employee Name Filter -->
-                            <MudTextField @bind-Value="filter.Name" Variant="Variant.Text" Margin="Margin.Dense" Typo="Typo.body2" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Rounded.Search" Placeholder="Search by employee name" />
-                        </MudItem>
-                        <div class="vr"></div>
-                        <MudItem Style="width: 120px">
-                            <!-- Date Filter -->
-                            <MudDatePicker @bind-Date="filter.Date" Variant="Variant.Text" Margin="Margin.Dense" ShowToolbar="false" IconSize="Size.Small" Style="font-size: 14px" />
-                        </MudItem>
-                        <div class="vr"></div>
-                        <MudItem Style="width: 180px">
-                            <!-- Work Cell Filter -->
-                            @if (filterOptions?.WorkCells != null)
-                            {
-                                <MudSelect @bind-Value="filter.WorkCell" Variant="Variant.Text" Margin="Margin.Dense" Typo="Typo.body2" Placeholder="Work cell" Dense>
-                                    @foreach (var workCell in filterOptions.WorkCells)
-                                    {
-                                        <MudSelectItem Value="workCell">@workCell</MudSelectItem>
-                                    }
-                                </MudSelect>
-                            }
-                            else
-                            {
-                                <MudSkeleton Animation="Animation.Wave" Height="100%" />
-                            }
-                        </MudItem>
-                        <div class="vr"></div>
-                        <MudItem Style="width: 180px">
-                            <!-- Department Filter -->
-                            @if (filterOptions?.Departments != null)
-                            {
-                                <MudSelect @bind-Value="filter.Department" Variant="Variant.Text" Margin="Margin.Dense" Typo="Typo.body2" Placeholder="Department" Dense>
-                                    @foreach (var department in filterOptions.Departments)
-                                    {
-                                        <MudSelectItem Value="department">@department</MudSelectItem>
-                                    }
-                                </MudSelect>
-                            }
-                            else
-                            {
-                                <MudSkeleton Animation="Animation.Wave" Height="100%" />
-                            }
-                        </MudItem>
-                        <div class="vr"></div>
-                        <MudStack Row Spacing="2">
-                            <!-- Filter Button -->
-                            <MudIconButton ButtonType="ButtonType.Submit" Icon="@Icons.Material.Rounded.FilterAlt" Size="Size.Small" title="Filter" />
-                            <!-- Reset Button -->
-                            <MudIconButton Icon="@Icons.Material.Rounded.Refresh" Size="Size.Small" title="Reset Filter" OnClick="ResetFilter" />
-                        </MudStack>
-                        <div class="vr"></div>
-                        <MudStack Row>
-                            <!-- Add Employee Turnstile Movement Button -->
-                            <MudButton IconClass="me-1" StartIcon="@Icons.Material.Rounded.Add" Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" DropShadow="false" Href="/employeeTurnstileMovement/create" title="Add Employee Turnstile Movement">
-                                Insert
-                            </MudButton>
-                            @* <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Rounded.Edit" title="Edit" OnClick="() => EditEmployeeTurnstileMovement(context.Item.Id)" /> *@
-                        </MudStack>
-                    </MudStack>
-                </EditForm>
-            </MudCardContent>
-        </MudCard>
-    </MudItem>
-
-    <!-- List of Present Employee Movement -->
-    <MudItem xs="12">
-        <MudCard Elevation="25">
-            <MudCardContent>
-                <MudDataGrid
-                    T="EmployeeTimeTracking"
-                    Items="presentEmployees"
-                    Loading="@isTableLoading"
-                    SortMode="SortMode.Single"
-                    ColumnResizeMode="ResizeMode.Container"
-                    Elevation="0"
-                    Hover
-                    Dense
-                >
-                    <LoadingContent>
-                        <MudText>Loading data...</MudText>
-                    </LoadingContent>
-                    <NoRecordsContent>
-                        <MudText>No data available</MudText>
-                    </NoRecordsContent>
-                    <ColGroup>
-                        <col style="min-width: 180px" />
-                        <col style="min-width: 250px" />
-                        <col style="min-width: 130px" />
-                        <col style="min-width: 170px" />
-                        <col style="min-width: 170px" />
-                        <col style="min-width: 150px" />
-                        <col style="min-width: 180px" />
-                        <col style="min-width: 210px" />
-                        <col style="min-width: 170px" />
-                    </ColGroup>
-                    <Columns>
-                        <PropertyColumn Property="x => x.PersonId" Title="Employee ID" />
-                        <PropertyColumn Property="x => x.Name" Title="Employee Name" />
-                        <PropertyColumn Property="@(x => x.Date.ToString("dd MMM yyyy"))" />
-                        <PropertyColumn Property="x => x.InitialTime" Title="Initial Time" />
-                        <PropertyColumn Property="x => x.FinalTime" Title="Final Time" />
-                        <PropertyColumn Property="x => x.Building" />
-                        <PropertyColumn Property="x => x.Department" />
-                        <PropertyColumn Property="x => x.WorkCell" Title="Work Cell" />
-                        <PropertyColumn Property="x => x.ShiftGroup" Title="Shift Group" />
-                        <TemplateColumn StickyRight>
-                            <CellTemplate>
-                                <MudStack Row Spacing="1">
-                                    <MudIconButton
-                                        Size="@Size.Small"
-                                        Icon="@Icons.Material.Rounded.RemoveRedEye"
-                                        OnClick="() => ViewEmployeeTurnstileMovement(context.Item.PersonId, context.Item.Date)"
-                                        title="View Employee Turnstile Movement"
-                                    />
-                                </MudStack>
-                            </CellTemplate>
-                        </TemplateColumn>
-                    </Columns>
-                    <PagerContent>
-                        <MudDataGridPager T="EmployeeTimeTracking" />
-                    </PagerContent>
-                </MudDataGrid>
+                <MovementTimeSeries TimelineData="turnstileActivityTimelineData" />
             </MudCardContent>
         </MudCard>
     </MudItem>
@@ -170,58 +51,30 @@
 
 @code {
     // Variable declaration & initialization
-    private bool isTableLoading = true;
-    private EmployeeMovementFilter filter = new (){ Date = DateTime.Parse("2021-6-13") };
-    private EmployeeMovementDashboard dashboardData = new();
-    private EmployeeMovementFilterSelection filterOptions = new ();
-    private IEnumerable<EmployeeTimeTracking>? presentEmployees;
+    private DateTime dateTimeToday = DateTime.Parse("2021-6-13");
+    private EmployeeMovementDashboard keyMetricsData = new();
+    private List<TimeSeriesChartSeries.TimeValue> turnstileActivityTimelineData = [];
 
     // Action on component initialization
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            filterOptions = await EmployeeMovementService.GetInitializedSelections();
-            dashboardData = EmployeeMovementService.DashboardData(filter.Date);
+            var dateToday = DateOnly.FromDateTime(dateTimeToday);
+
+            keyMetricsData = await DashboardService.KeyMetricsData(dateToday);
+            turnstileActivityTimelineData = await DashboardService.TurnstileMovementOverTime(dateToday);
         }
         catch (Exception)
         {
             Snackbar.Add("An error occurred while loading the page data. Please refresh the page or try again later.", Severity.Error);
         }
-
-        // Load data depending on filter
-        await LoadFilteredData();
-    }
-
-    // Load the filtered data
-    private async Task LoadFilteredData()
-    {
-        isTableLoading = true;
-        try
-        {
-            presentEmployees = await EmployeeTimeTrackingService.PresentEmployeeMovementList(filter);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add("An error occurred while loading the list of present employee movement. Please refresh the page or try again later.", Severity.Error);
-        }
-        isTableLoading = false;
-    }
-
-    // Apply the filter to the list.
-    private Task ApplyFilter() => LoadFilteredData();
-
-    // Reset/clear the list filter
-    private Task ResetFilter()
-    {
-        filter = new EmployeeMovementFilter { Date = DateTime.Parse("2021-6-13") };
-        return LoadFilteredData();
     }
 
     // View the employee turnstile movement details
-    private void ViewEmployeeTurnstileMovement(string personId, DateOnly date)
+    private void ViewPresentEmployeeMovement(DateOnly date)
     {
-        var fullUrl = QueryHelpers.AddQueryString($"/employeeTurnstileMovement/{personId}",new Dictionary<string, string?>
+        var fullUrl = QueryHelpers.AddQueryString($"/presentEmployeeMovement", new Dictionary<string, string?>
             {
                 ["Date"] = date.ToString("yyyy-MM-dd")
             });

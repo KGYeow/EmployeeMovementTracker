@@ -3,7 +3,6 @@ using EmpMovementTracker.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace EmpMovementTracker.Services
 {
@@ -11,18 +10,6 @@ namespace EmpMovementTracker.Services
     {
         public EmployeeMovementService(TurnstileDbContext context) : base(context)
         {
-        }
-
-        // Get the dashboard data for the list of present employee movement based on the date.
-        public EmployeeMovementDashboard DashboardData(DateTime? date)
-        {
-            var list = context.EmployeeMovements.Where(f => f.Date == DateOnly.FromDateTime((DateTime)date)).AsQueryable();
-
-            return new EmployeeMovementDashboard
-            {
-                TotalEmployee = list.Select(f => f.PersonId).Distinct().Count(),
-                TotalTurnstileAccess = list.Count()
-            };
         }
 
         // Get the initialized & populated neccessary selections.

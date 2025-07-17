@@ -1,0 +1,53 @@
+﻿@inject ISnackbar Snackbar
+
+<MudTimeSeriesChart
+    ChartSeries="series"
+    ChartOptions="options"
+    TimeLabelSpacing="TimeSpan.FromMinutes(30)"
+    DataMarkerTooltipTimeLabelFormat="HH:mm tt"
+    Width="100%"
+/>
+
+@code {
+    [Parameter] public List<TimeSeriesChartSeries.TimeValue> TimelineData { get; set; } = [];
+
+    // Variable declaration & initialization
+    private List<TimeSeriesChartSeries> series = new();
+    private TimeSeriesChartSeries chart = new();
+    private ChartOptions options = new ChartOptions
+    {
+        YAxisLines = false,
+        YAxisTicks = 50,
+        MaxNumYAxisTicks = 10,
+        YAxisRequireZeroPoint = true,
+        LineStrokeWidth = 1,
+        ShowLegend = false,
+    };
+
+    // Action on component initialization
+    protected override void OnParametersSet()
+    {
+        try
+        {
+            // Clear previous data if any
+            series.Clear();
+
+            chart = new TimeSeriesChartSeries
+            {
+                Index = 0,
+                Data = TimelineData,
+                IsVisible = true,
+                LineDisplayType = LineDisplayType.Line,
+                DataMarkerTooltipTitleFormat = "{{X_VALUE}}",
+                DataMarkerTooltipSubtitleFormat = "Turnstile Access Count: {{Y_VALUE}}"
+            };
+            series.Add(chart);
+
+            StateHasChanged();
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("An error occurred while loading the chart data. Please refresh the page or try again later.", Severity.Error);
+        }
+    }
+}
