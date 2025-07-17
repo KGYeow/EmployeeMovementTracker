@@ -1,0 +1,61 @@
+﻿@inject ISnackbar Snackbar
+
+<MudChart
+    Class="turnstileMovementEachBuildingBarChart"
+    ChartType="ChartType.Bar"
+    ChartSeries="@series"
+    XAxisLabels="@xAxisLabels"
+    ChartOptions="chartOptions"
+    AxisChartOptions="axisChartOptions"
+    Width="100%"
+    Height="200px"
+>
+    <CustomGraphics>
+        <style>
+            .turnstileMovementEachBuildingBarChart text {
+                font-size: xx-small;
+            }
+        </style>
+    </CustomGraphics>
+</MudChart>
+
+@code {
+    [Parameter] public Dictionary<string, double> ChartData { get; set; } = [];
+
+    // Variable declaration & initialization
+    private AxisChartOptions axisChartOptions = new AxisChartOptions
+    {
+        MatchBoundsToSize = true,
+    };
+    private ChartOptions chartOptions = new ChartOptions
+    {
+        YAxisTicks = 1000,
+        ShowLegend = false,
+    };
+    private List<ChartSeries> series = new List<ChartSeries>();
+    private ChartSeries chart = new();
+    private string[] xAxisLabels = [];
+
+    // Action on component initialization
+    protected override void OnParametersSet()
+    {
+        try
+        {
+            // Clear previous data if any
+            series.Clear();
+
+            xAxisLabels = ChartData.Keys.ToArray();
+            chart = new ChartSeries
+            {
+                Data = ChartData.Values.ToArray(),
+            };
+            series.Add(chart);
+
+            StateHasChanged();
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("An error occurred while loading the chart data. Please refresh the page or try again later.", Severity.Error);
+        }
+    }
+}

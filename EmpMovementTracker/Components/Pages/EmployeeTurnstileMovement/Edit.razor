@@ -1,10 +1,11 @@
 ﻿@page "/employeeTurnstileMovement/{personId}/{date:datetime}/{employeeMovementId:int}/edit"
 
+@using System.ComponentModel.DataAnnotations
+@using EmpMovementTracker.Components.Shared
 @using EmpMovementTracker.Constants
 @using EmpMovementTracker.DTOs
+@using EmpMovementTracker.DTOs.EmployeeTurnstileMovement
 @using EmpMovementTracker.Services
-@using EmpMovementTracker.Components.Shared
-@using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.WebUtilities
 
 @inject EmployeeMovementService EmployeeMovementService
