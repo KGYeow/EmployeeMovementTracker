@@ -25,7 +25,7 @@
     <!-- Main Content -->
     <MudMainContent Class="min-vh-100">
         <!-- Page Content -->
-        <MudContainer Class="my-6" MaxWidth="MaxWidth.Large">
+        <MudContainer Class="py-6" MaxWidth="MaxWidth.Large">
             @Body
         </MudContainer>
     </MudMainContent>
@@ -37,7 +37,7 @@
 @code {
     // Variable declaration & initialization
     private bool drawerOpen = false;
-    
+
     // Define custom theme
     MudTheme MyCustomTheme = new MudTheme()
     {
@@ -48,6 +48,10 @@
             Tertiary = "#E8EAF6",
             Background = "#F5F5F5",
             DrawerIcon = "#FFFFFF",
+        },
+        LayoutProperties = new LayoutProperties()
+        {
+            DefaultBorderRadius = "8px",
         }
     };
 }

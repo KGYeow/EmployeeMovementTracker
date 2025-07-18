@@ -2,7 +2,7 @@
 
 <MudChart
     Class="turnstileMovementEachBuildingBarChart"
-    ChartType="ChartType.Bar"
+    ChartType="ChartType.StackedBar"
     ChartSeries="@series"
     XAxisLabels="@xAxisLabels"
     ChartOptions="chartOptions"
@@ -29,7 +29,9 @@
     };
     private ChartOptions chartOptions = new ChartOptions
     {
-        YAxisTicks = 1000,
+        YAxisLines = false,
+        YAxisTicks = 2000,
+        MaxNumYAxisTicks = 5,
         ShowLegend = false,
     };
     private List<ChartSeries> series = new List<ChartSeries>();

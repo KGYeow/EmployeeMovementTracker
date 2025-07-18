@@ -2,7 +2,6 @@
 
 @using EmpMovementTracker.Components.Shared
 @using EmpMovementTracker.Constants
-@using EmpMovementTracker.DTOs
 @using EmpMovementTracker.DTOs.EmployeeTurnstileMovement
 @using EmpMovementTracker.Models
 @using EmpMovementTracker.Services
@@ -162,7 +161,7 @@
     private EmployeeMovementFilter filter = new();
     private EmployeeMovementFilterSelection filterOptions = new();
     private EmployeeTimeTracking employeeInfo = new();
-    private IEnumerable<EmployeeMovement>? employeeMovements;
+    private IEnumerable<EmployeeMovement> employeeMovements = [];
 
     // Action on component initialization
     protected override async Task OnInitializedAsync()

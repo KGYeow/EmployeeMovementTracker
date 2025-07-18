@@ -1,7 +1,6 @@
 ﻿@page "/dailyPresenceTimes"
 
 @using EmpMovementTracker.Constants
-@using EmpMovementTracker.DTOs
 @using EmpMovementTracker.DTOs.EmployeeTurnstileMovement
 @using EmpMovementTracker.Models
 @using EmpMovementTracker.Services
@@ -156,7 +155,7 @@
     private bool isTableLoading = true;
     private EmployeeMovementFilter filter = new (){ Date = DateTime.Parse("2021-6-13") };
     private EmployeeMovementFilterSelection filterOptions = new ();
-    private IEnumerable<EmployeeTimeTracking>? presentEmployees;
+    private IEnumerable<EmployeeTimeTracking> presentEmployees = [];
 
     // Action on component initialization
     protected override async Task OnInitializedAsync()
