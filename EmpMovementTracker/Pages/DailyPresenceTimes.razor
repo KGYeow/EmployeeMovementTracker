@@ -35,36 +35,22 @@
                         <div class="vr"></div>
                         <MudItem Style="width: 180px">
                             <!-- Work Cell Filter -->
-                            @if (filterOptions?.WorkCells != null)
-                            {
-                                <MudSelect @bind-Value="filter.WorkCell" Variant="Variant.Text" Margin="Margin.Dense" Typo="Typo.body2" Placeholder="Work cell" Dense>
-                                    @foreach (var workCell in filterOptions.WorkCells)
-                                    {
-                                        <MudSelectItem Value="workCell">@workCell</MudSelectItem>
-                                    }
-                                </MudSelect>
-                            }
-                            else
-                            {
-                                <MudSkeleton Animation="Animation.Wave" Height="100%" />
-                            }
+                            <MudSelect @bind-Value="filter.WorkCell" Variant="Variant.Text" Margin="Margin.Dense" Typo="Typo.body2" Placeholder="Work cell" Dense>
+                                @foreach (var workCell in filterOptions.WorkCells)
+                                {
+                                    <MudSelectItem Value="workCell">@workCell</MudSelectItem>
+                                }
+                            </MudSelect>
                         </MudItem>
                         <div class="vr"></div>
                         <MudItem Style="width: 180px">
                             <!-- Department Filter -->
-                            @if (filterOptions?.Departments != null)
-                            {
-                                <MudSelect @bind-Value="filter.Department" Variant="Variant.Text" Margin="Margin.Dense" Typo="Typo.body2" Placeholder="Department" Dense>
-                                    @foreach (var department in filterOptions.Departments)
-                                    {
-                                        <MudSelectItem Value="department">@department</MudSelectItem>
-                                    }
-                                </MudSelect>
-                            }
-                            else
-                            {
-                                <MudSkeleton Animation="Animation.Wave" Height="100%" />
-                            }
+                            <MudSelect @bind-Value="filter.Department" Variant="Variant.Text" Margin="Margin.Dense" Typo="Typo.body2" Placeholder="Department" Dense>
+                                @foreach (var department in filterOptions.Departments)
+                                {
+                                    <MudSelectItem Value="department">@department</MudSelectItem>
+                                }
+                            </MudSelect>
                         </MudItem>
                         <div class="vr"></div>
                         <MudStack Row Spacing="2">
@@ -79,7 +65,6 @@
                             <MudButton IconClass="me-1" StartIcon="@Icons.Material.Rounded.Add" Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" DropShadow="false" Href="/employeeTurnstileMovement/create" title="Add Employee Turnstile Movement">
                                 Insert
                             </MudButton>
-                            @* <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Rounded.Edit" title="Edit" OnClick="() => EditEmployeeTurnstileMovement(context.Item.Id)" /> *@
                         </MudStack>
                     </MudStack>
                 </EditForm>

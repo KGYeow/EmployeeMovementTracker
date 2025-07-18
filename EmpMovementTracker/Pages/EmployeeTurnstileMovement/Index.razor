@@ -71,19 +71,12 @@
                         <div class="vr"></div>
                         <MudItem Style="width: 200px">
                             <!-- Work Cell Filter -->
-                            @if (filterOptions?.BuildingIds != null)
-                            {
-                                <MudSelect @bind-Value="filter.BuildingId" Variant="Variant.Text" Margin="Margin.Dense" Typo="Typo.body2" Placeholder="Accessed Building ID" Dense>
-                                    @foreach (var buildingId in filterOptions.BuildingIds)
-                                    {
-                                        <MudSelectItem Value="buildingId">@buildingId</MudSelectItem>
-                                    }
-                                </MudSelect>
-                            }
-                            else
-                            {
-                                <MudSkeleton Animation="Animation.Wave" Height="100%" />
-                            }
+                            <MudSelect @bind-Value="filter.BuildingId" Variant="Variant.Text" Margin="Margin.Dense" Typo="Typo.body2" Placeholder="Accessed Building ID" Dense>
+                                @foreach (var buildingId in filterOptions.BuildingIds)
+                                {
+                                    <MudSelectItem Value="buildingId">@buildingId</MudSelectItem>
+                                }
+                            </MudSelect>
                         </MudItem>
                         <div class="vr"></div>
                         <MudStack Row Spacing="2">
