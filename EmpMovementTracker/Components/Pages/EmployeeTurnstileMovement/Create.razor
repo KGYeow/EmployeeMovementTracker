@@ -149,6 +149,7 @@
 
 @code {
     // Variable declaration & initialization
+    private bool isLoading = true;
     private EmployeeMovementFilterSelection filterOptions = new();
     private EmployeeMovementCreate createEmployeeMovement = new();
     private MudForm form = null!;
@@ -159,13 +160,12 @@
         try
         {
             filterOptions = await EmployeeMovementService.GetInitializedSelections();
+            isLoading = false;
         }
         catch (Exception)
         {
             Snackbar.Add("An error occurred while loading the page data. Please refresh the page or try again later.", Severity.Error);
         }
-
-
     }
 
     // Update the employee turnstile movement (open the update confirmation dialog)
