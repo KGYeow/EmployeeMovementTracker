@@ -1,4 +1,4 @@
-using EmpMovementTracker.Components;
+using EmpMovementTracker;
 using EmpMovementTracker.Models;
 using EmpMovementTracker.Services;
 using Microsoft.EntityFrameworkCore;
