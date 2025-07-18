@@ -165,9 +165,40 @@
             Snackbar.Add("An error occurred while loading the page data. Please refresh the page or try again later.", Severity.Error);
         }
 
- 
+
     }
 
+    // Update the employee turnstile movement (open the update confirmation dialog)
+    private async Task CreateEmployeeTurnstileMovement()
+    {
+        var parameters = new DialogParameters<ConfirmationDialog>
+        {
+            { x => x.ContentText, "Are you sure you want to submit new employee turnstile movement data?" },
+            { x => x.SubmitBtnText, "Confirm" },
+        };
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+        var dialog = await DialogService.ShowAsync<ConfirmationDialog>("Submit Confirmation", parameters, options);
+        var dialogResult = await dialog.Result;
+
+        if (!dialogResult.Canceled)
+        {
+            try
+            {
+                // Update the employee turnstile movement
+                await EmployeeMovementService.Create(createEmployeeMovement);
+                Snackbar.Add("The employee turnstile movement has been submited.", Severity.Success);
+            }
+            catch (Exception)
+            {
+                Snackbar.Add("An unexpected error occurred while submit employee turnstile movement data. Please try again.", Severity.Error);
+            }
+        }
+        else
+        {
+            createEmployeeMovement = new EmployeeMovementCreate(); //Reset the form
+            StateHasChanged(); //Refresh the UI
+        }
+    }
 
     // Cancel editing the employee turnstile movement
     private async Task CancelCreateEmployeeTurnstileMovement()
@@ -184,39 +215,8 @@
 
         if (!dialogResult.Canceled)
         {
-            createEmployeeMovement = new EmployeeMovementCreate(); //Reset the form
-            StateHasChanged(); //Refresh the UI
+            Navigation.NavigateTo("/dailyPresenceTimes");
         }
 
-    }
-
-
-    // Update the employee turnstile movement (open the update confirmation dialog)
-    private async Task CreateEmployeeTurnstileMovement()
-    {
-        var parameters = new DialogParameters<ConfirmationDialog>
-        {
-            { x => x.ContentText, "Are you sure you want to submit changes?" },
-            { x => x.SubmitBtnText, "Confirm" },
-        };
-        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
-        var dialog = await DialogService.ShowAsync<ConfirmationDialog>("Submit Confirmation", parameters, options);
-        var dialogResult = await dialog.Result;
-
-        if (!dialogResult.Canceled)
-        {
-            try
-            {
-                // Update the employee turnstile movement
-                await EmployeeMovementService.Create(createEmployeeMovement);
-                createEmployeeMovement = new EmployeeMovementCreate(); //Reset the form
-                StateHasChanged(); //Refresh the UI
-                Snackbar.Add("The employee turnstile movement has been updated.", Severity.Success);
-            }
-            catch (Exception)
-            {
-                Snackbar.Add("An unexpected error occurred while updating employee turnstile movement data. Please try again.", Severity.Error);
-            }
-        }
     }
 }
