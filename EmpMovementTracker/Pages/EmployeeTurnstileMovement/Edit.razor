@@ -17,6 +17,8 @@
 <!-- Page Title-->
 <h2 class="mb-6 fw-bold">Edit Employee Turnstile Movement</h2>
 
+<LoadingOverlay Visible="isUpdateLoading"/>
+@isUpdateLoading
 <MudGrid>
     <!-- Employee Turnstile Movement Edit Form -->
     <MudItem xs="12">
@@ -156,6 +158,7 @@
 
     // Variable declaration & initialization
     private bool isFormLoading = true;
+    private bool isUpdateLoading = false;
     private EmployeeMovementFilterSelection filterOptions = new();
     private EmployeeMovementEdit editEmployeeMovement = new();
     private MudForm form = null!;
@@ -222,8 +225,10 @@
 
         if (!dialogResult.Canceled)
         {
+            isUpdateLoading = true;
             try
             {
+                await Task.Delay(2000);
                 // Update the employee turnstile movement
                 await EmployeeMovementService.Update(editEmployeeMovement, EmployeeMovementId);
                 Snackbar.Add("The employee turnstile movement has been updated.", Severity.Success);
@@ -232,6 +237,7 @@
             {
                 Snackbar.Add("An unexpected error occurred while updating employee turnstile movement data. Please try again.", Severity.Error);
             }
+            isUpdateLoading = false;
         }
     }
 }

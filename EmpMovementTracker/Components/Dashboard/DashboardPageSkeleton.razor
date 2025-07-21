@@ -1,0 +1,28 @@
+﻿<MudGrid>
+    @for (int i = 0; i < 3; i++)
+    {
+        <MudItem xs="12" sm="4">
+            <MudCard Elevation="25">
+                <MudCardContent>
+                    <MudSkeleton Width="50%" Animation="Animation.Wave" />
+                    <MudSkeleton Width="70%" Height="32px" Animation="Animation.Wave" />
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    }
+    @for (int i = 0; i < 2; i++)
+    {
+        <MudItem xs="12" sm="6">
+            <MudCard Elevation="25">
+                <MudCardHeader Class="pb-0">
+                    <CardHeaderContent>
+                        <MudSkeleton Width="70%" Height="30px" Animation="Animation.Wave" />
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudSkeleton Height="200px" SkeletonType="SkeletonType.Rectangle" Animation="Animation.Wave" />
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    }
+</MudGrid>

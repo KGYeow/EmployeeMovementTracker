@@ -1,0 +1,11 @@
+﻿<MudOverlay Visible="Visible" LightBackground Absolute>
+    <MudStack AlignItems="AlignItems.Center">
+        <MudProgressCircular Color="Color.Primary" StrokeWidth="4" Size="Size.Medium" Rounded Indeterminate />
+        <MudText Typo="Typo.body2">@Text</MudText>
+    </MudStack>
+</MudOverlay>
+
+@code{
+    [Parameter] public bool Visible { get; set; } = true;
+    [Parameter] public string Text { get; set; } = "Loading...";
+}
