@@ -78,7 +78,7 @@ else
 
 @code {
     // Variable declaration & initialization
-    private bool isPageLoading = true;
+    private bool isPageLoading = false;
     private DateTime dateTimeToday = DateTime.Parse("2021-6-13");
     private DashboardKeyMetrics keyMetricsData = new();
     private List<TimeSeriesChartSeries.TimeValue> turnstileActivityTimelineData = [];
@@ -87,6 +87,7 @@ else
     // Action on component initialization
     protected override async Task OnInitializedAsync()
     {
+        isPageLoading = true;
         try
         {
             var dateToday = DateOnly.FromDateTime(dateTimeToday);

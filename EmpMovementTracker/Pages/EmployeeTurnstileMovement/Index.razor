@@ -27,31 +27,54 @@
                     <MudIcon Icon="@Icons.Material.Rounded.Person" Color="Color.Default" Size="Size.Large"/>
                 </CardHeaderAvatar>
                 <CardHeaderContent>
-                    <MudText Typo="Typo.h6" Style="line-height: normal">@employeeInfo.Name</MudText>
-                    <MudText Typo="Typo.caption" Class="text-muted" Style="line-height: normal" HtmlTag="i">Employee ID: @PersonId</MudText>
+                    @if (isDataLoading)
+                    {
+                        <MudSkeleton Width="30%" Height="32px" Animation="Animation.Wave" />
+                        <MudSkeleton Width="15%" Height="12px" Animation="Animation.Wave" />
+                    }
+                    else
+                    {
+                        <MudText Typo="Typo.h6" Style="line-height: normal">@employeeInfo.Name</MudText>
+                        <MudText Typo="Typo.caption" Class="text-muted" Style="line-height: normal" HtmlTag="i">Employee ID: @PersonId</MudText>
+                    }
                 </CardHeaderContent>
             </MudCardHeader>
             <MudCardContent Class="pt-0">
                 <MudStack Row Wrap="Wrap.Wrap" StretchItems="StretchItems.All">
                     <MudStack Spacing="0">
                         <MudText Typo="Typo.subtitle2">Date</MudText>
-                        <MudText Typo="Typo.body2" Class="text-muted">@Date.ToString("dd MMM yyyy")</MudText>
+                        @if (isDataLoading)
+                        { <MudSkeleton Width="50%" Height="20px" Animation="Animation.Wave" /> }
+                        else
+                        { <MudText Typo="Typo.body2" Class="text-muted">@Date.ToString("dd MMM yyyy")</MudText> }
                     </MudStack>
                     <MudStack Spacing="0">
                         <MudText Typo="Typo.subtitle2">Building</MudText>
-                        <MudText Typo="Typo.body2" Class="text-muted">@employeeInfo.Building</MudText>
+                        @if (isDataLoading)
+                        { <MudSkeleton Width="50%" Height="20px" Animation="Animation.Wave" /> }
+                        else
+                        { <MudText Typo="Typo.body2" Class="text-muted">@employeeInfo.Building</MudText> }
                     </MudStack>
                     <MudStack Spacing="0">
                         <MudText Typo="Typo.subtitle2">Department</MudText>
-                        <MudText Typo="Typo.body2" Class="text-muted">@employeeInfo.Department</MudText>
+                        @if (isDataLoading)
+                        { <MudSkeleton Width="50%" Height="20px" Animation="Animation.Wave" /> }
+                        else
+                        { <MudText Typo="Typo.body2" Class="text-muted">@employeeInfo.Department</MudText> }
                     </MudStack>
                     <MudStack Spacing="0">
                         <MudText Typo="Typo.subtitle2">Work Cell</MudText>
-                        <MudText Typo="Typo.body2" Class="text-muted">@employeeInfo.WorkCell</MudText>
+                        @if (isDataLoading)
+                        { <MudSkeleton Width="50%" Height="20px" Animation="Animation.Wave" /> }
+                        else
+                        { <MudText Typo="Typo.body2" Class="text-muted">@employeeInfo.WorkCell</MudText> }
                     </MudStack>
                     <MudStack Spacing="0">
                         <MudText Typo="Typo.subtitle2">Shift Group</MudText>
-                        <MudText Typo="Typo.body2" Class="text-muted">@employeeInfo.ShiftGroup</MudText>
+                        @if (isDataLoading)
+                        { <MudSkeleton Width="50%" Height="20px" Animation="Animation.Wave" /> }
+                        else
+                        { <MudText Typo="Typo.body2" Class="text-muted">@employeeInfo.ShiftGroup</MudText> }
                     </MudStack>
                 </MudStack>
             </MudCardContent>
@@ -150,7 +173,8 @@
     public DateOnly Date { get; set; }
 
     // Variable declaration & initialization
-    private bool isTableLoading = true;
+    private bool isDataLoading = false;
+    private bool isTableLoading = false;
     private EmployeeMovementFilter filter = new();
     private EmployeeMovementFilterSelection filterOptions = new();
     private EmployeeTimeTracking employeeInfo = new();
@@ -159,6 +183,7 @@
     // Action on component initialization
     protected override async Task OnInitializedAsync()
     {
+        isDataLoading = true;
         try
         {
             filter = new EmployeeMovementFilter { Date = Date.ToDateTime(TimeOnly.MinValue) };
@@ -169,6 +194,7 @@
         {
             Snackbar.Add("An error occurred while loading the page data. Please refresh the page or try again later.", Severity.Error);
         }
+        isDataLoading = false;
 
         // Load data depending on filter
         await LoadFilteredData();

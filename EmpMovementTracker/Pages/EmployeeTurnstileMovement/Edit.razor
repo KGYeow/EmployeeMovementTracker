@@ -17,8 +17,7 @@
 <!-- Page Title-->
 <h2 class="mb-6 fw-bold">Edit Employee Turnstile Movement</h2>
 
-<LoadingOverlay Visible="isUpdateLoading"/>
-@isUpdateLoading
+<LoadingOverlay Visible="isUpdateLoading" Text="Saving your changes..." />
 <MudGrid>
     <!-- Employee Turnstile Movement Edit Form -->
     <MudItem xs="12">
@@ -38,7 +37,7 @@
                             <!-- Employee ID -->
                             <MudItem xs="12" sm="6">
                                 <MudInputLabel>Employee ID</MudInputLabel>
-                                <MudTextField T="string" Value="PersonId" Variant="Variant.Outlined" Margin="Margin.Dense" Typo="Typo.body2" Disabled />
+                                <MudTextField T="string" Value="editEmployeeMovement.PersonId" Variant="Variant.Outlined" Margin="Margin.Dense" Typo="Typo.body2" Disabled />
                             </MudItem>
                             <!-- Work Cell -->
                             <MudItem xs="12" sm="4">
@@ -157,7 +156,7 @@
     [Parameter] public int EmployeeMovementId { get; set; }
 
     // Variable declaration & initialization
-    private bool isFormLoading = true;
+    private bool isFormLoading = false;
     private bool isUpdateLoading = false;
     private EmployeeMovementFilterSelection filterOptions = new();
     private EmployeeMovementEdit editEmployeeMovement = new();
@@ -228,7 +227,8 @@
             isUpdateLoading = true;
             try
             {
-                await Task.Delay(2000);
+                StateHasChanged();
+
                 // Update the employee turnstile movement
                 await EmployeeMovementService.Update(editEmployeeMovement, EmployeeMovementId);
                 Snackbar.Add("The employee turnstile movement has been updated.", Severity.Success);
