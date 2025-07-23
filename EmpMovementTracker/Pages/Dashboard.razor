@@ -1,19 +1,28 @@
 ﻿@page "/"
 
 @using EmpMovementTracker.Components.Dashboard
+@using EmpMovementTracker.Components.Shared
 @using EmpMovementTracker.Constants
 @using EmpMovementTracker.DTOs.Dashboard
+@using EmpMovementTracker.DTOs.EmployeeTurnstileMovement
 @using EmpMovementTracker.Services
 @using Microsoft.AspNetCore.WebUtilities;
 
 @inject DashboardService DashboardService
+@inject EmployeeMovementService EmployeeMovementService
 @inject ISnackbar Snackbar
 @inject NavigationManager Navigation
 
 <PageTitle>Dashboard - @AppConstant.AppTitle</PageTitle>
 
-<!-- Page Title-->
-<h2 class="mb-6 fw-bold">Dashboard</h2>
+<!-- Page Header-->
+<PageHeader Title="Dashboard">
+    <RightHeaderContent>
+        <MudItem xs=12 sm="1" Class="d-flex justify-end align-center">
+            <MudToggleIconButton Icon="@Icons.Material.Rounded.FilterList" ToggledIcon="@Icons.Material.Rounded.FilterListOff" Color="Color.Inherit" Size="Size.Small" @bind-Toggled="filterDrawerOpen" />
+        </MudItem>
+    </RightHeaderContent>
+</PageHeader>
 
 @if (isPageLoading)
 { <DashboardPageSkeleton /> }
@@ -74,12 +83,54 @@ else
             </MudCard>
         </MudItem>
     </MudGrid>
+
+    <MudDrawer Variant="DrawerVariant.Persistent" ClipMode="DrawerClipMode.Always" Anchor="Anchor.End" @bind-Open="@filterDrawerOpen">
+        <MudDrawerHeader>
+            <MudText Class="fw-bold" Typo="Typo.h6">Filters</MudText>
+        </MudDrawerHeader>
+        <MudContainer Class="flex-grow-1">
+            <EditForm class="d-flex flex-column h-100" FormName="DashboardFilterForm" Model="@filter" OnValidSubmit="ApplyFilter">
+                <div class="flex-grow-1">
+                    <MudGrid Spacing="2">
+                        <!-- Date Filter -->
+                        <MudItem xs="12">
+                            <MudInputLabel>Date</MudInputLabel>
+                            <MudDatePicker @bind-Date="filter.Date" DateFormat="dd/MM/yyyy" Variant="Variant.Outlined" Margin="Margin.Dense" ShowToolbar="false" IconSize="Size.Small" Style="font-size: 14px" />
+                        </MudItem>
+                        <!-- Building Filter -->
+                        <MudItem xs="12">
+                            <MudInputLabel>Building</MudInputLabel>
+                            <MudSelect @bind-Value="filter.BuildingId" Variant="Variant.Outlined" Margin="Margin.Dense" Typo="Typo.body2" Placeholder="Building" Dense>
+                                <MudSelectItem Value="String.Empty">All</MudSelectItem>
+                                @foreach (var buildingId in filterOptions.BuildingIds)
+                                {
+                                    <MudSelectItem Value="buildingId">@buildingId</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                    </MudGrid>
+                </div>
+                <MudStack Row Class="py-3" Spacing="1" Justify="Justify.FlexEnd">
+                    <!-- Reset Button -->
+                    <MudButton Color="Color.Primary" title="Reset" OnClick="ResetFilter">
+                        Reset
+                    </MudButton>
+                    <!-- Apply Filter Button -->
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" DropShadow="false" title="Apply Filter">
+                        Apply
+                    </MudButton>
+                </MudStack>
+            </EditForm>
+        </MudContainer>
+    </MudDrawer>
 }
 
 @code {
     // Variable declaration & initialization
     private bool isPageLoading = false;
-    private DateTime dateTimeToday = DateTime.Parse("2021-6-13");
+    private bool filterDrawerOpen = false;
+    private DashboardFilter filter = new() { Date = DateTime.Parse("2021-6-13") };
+    private EmployeeMovementFilterSelection filterOptions = new();
     private DashboardKeyMetrics keyMetricsData = new();
     private List<TimeSeriesChartSeries.TimeValue> turnstileActivityTimelineData = [];
     private Dictionary<string, double> turnstileMovementEachBuildingData = [];
@@ -87,19 +138,49 @@ else
     // Action on component initialization
     protected override async Task OnInitializedAsync()
     {
+        try
+        {
+            filterOptions = await EmployeeMovementService.GetInitializedSelections();
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("An error occurred while loading the page data. Please refresh the page or try again later.", Severity.Error);
+        }
+
+        // Load dashboard data depending on filter
+        await LoadFilteredDashboard();
+    }
+
+    // Load the filtered dashboard
+    private async Task LoadFilteredDashboard()
+    {
         isPageLoading = true;
         try
         {
-            var dateToday = DateOnly.FromDateTime(dateTimeToday);
+            StateHasChanged();
 
-            keyMetricsData = await DashboardService.KeyMetricsData(dateToday);
-            turnstileActivityTimelineData = await DashboardService.TurnstileActivityOverTime(dateToday);
-            turnstileMovementEachBuildingData = await DashboardService.TurnstileMovementEachBuilding(dateToday);
+            keyMetricsData = await DashboardService.KeyMetricsData(filter);
+            turnstileActivityTimelineData = await DashboardService.TurnstileActivityOverTime(filter);
+            turnstileMovementEachBuildingData = await DashboardService.TurnstileMovementEachBuilding(filter);
+        }
+        catch (ArgumentNullException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Warning);
         }
         catch (Exception)
         {
             Snackbar.Add("An error occurred while loading the dashboard data. Please refresh the page or try again later.", Severity.Error);
         }
         isPageLoading = false;
+    }
+
+    // Apply the filter to the dashboard.
+    private Task ApplyFilter() => LoadFilteredDashboard();
+
+    // Reset/clear the list filter
+    private Task ResetFilter()
+    {
+        filter = new DashboardFilter { Date = DateTime.Parse("2021-6-13") };
+        return LoadFilteredDashboard();
     }
 }

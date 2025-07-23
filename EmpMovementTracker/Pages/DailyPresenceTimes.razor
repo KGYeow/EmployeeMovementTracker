@@ -1,5 +1,6 @@
 ﻿@page "/dailyPresenceTimes"
 
+@using EmpMovementTracker.Components.Shared
 @using EmpMovementTracker.Constants
 @using EmpMovementTracker.DTOs.EmployeeTurnstileMovement
 @using EmpMovementTracker.Models
@@ -13,8 +14,8 @@
 
 <PageTitle>Daily Presence Times - @AppConstant.AppTitle</PageTitle>
 
-<!-- Page Title-->
-<h2 class="mb-6 fw-bold">Employee Daily Presence Times</h2>
+<!-- Page Header-->
+<PageHeader Title="Employee Daily Presence Times" />
 
 <MudGrid>
     <!-- Filter Section -->

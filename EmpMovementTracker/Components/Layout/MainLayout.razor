@@ -18,7 +18,7 @@
     </MudAppBar>
 
     <!-- Sidebar -->
-    <MudDrawer Class="py-2" Variant="@DrawerVariant.Mini" Color="Color.Primary" ClipMode="DrawerClipMode.Always" @bind-Open="@drawerOpen">
+    <MudDrawer Variant="DrawerVariant.Mini" Color="Color.Primary" ClipMode="DrawerClipMode.Always" @bind-Open="@drawerOpen">
         <NavMenu DrawerOpen="drawerOpen" />
     </MudDrawer>
 
@@ -37,6 +37,9 @@
 @code {
     // Variable declaration & initialization
     private bool drawerOpen = false;
+
+    // [Inject]
+    // private IBrowserViewportService BrowserViewportService { get; set; }
 
     // Define custom theme
     MudTheme MyCustomTheme = new MudTheme()

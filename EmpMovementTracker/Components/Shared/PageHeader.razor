@@ -1,0 +1,15 @@
+﻿<MudStack Class="mb-5" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap" Spacing="0" Row>
+    <MudItem Class="flex-grow-1">
+        <MudText Class="fw-bold" Typo="Typo.h4">@Title</MudText>
+    </MudItem>
+
+    @if (RightHeaderContent != null)
+    {
+        @RightHeaderContent
+    }
+</MudStack>
+
+@code {
+    [Parameter] public string Title { get; set; } = "Page Title";
+    [Parameter] public RenderFragment? RightHeaderContent { get; set; }
+}
