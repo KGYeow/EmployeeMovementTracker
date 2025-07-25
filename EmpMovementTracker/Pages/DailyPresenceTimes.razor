@@ -138,9 +138,9 @@
 
 @code {
     // Variable declaration & initialization
-    private bool isTableLoading = false;
-    private EmployeeMovementFilter filter = new (){ Date = DateTime.Parse("2021-6-13") };
-    private EmployeeMovementFilterSelection filterOptions = new ();
+    private bool isTableLoading = true;
+    private EmployeeMovementFilter filter = new();
+    private EmployeeMovementFilterSelection filterOptions = new();
     private IEnumerable<EmployeeTimeTracking> presentEmployees = [];
 
     // Action on component initialization
@@ -163,6 +163,7 @@
     private async Task LoadFilteredData()
     {
         isTableLoading = true;
+
         try
         {
             presentEmployees = await EmployeeTimeTrackingService.PresentEmployeeMovementList(filter);
@@ -175,13 +176,13 @@
     }
 
     // Apply the filter to the list.
-    private Task ApplyFilter() => LoadFilteredData();
+    private async Task ApplyFilter() => await LoadFilteredData();
 
     // Reset/clear the list filter
-    private Task ResetFilter()
+    private async Task ResetFilter()
     {
-        filter = new EmployeeMovementFilter { Date = DateTime.Parse("2021-6-13") };
-        return LoadFilteredData();
+        filter = new();
+        await LoadFilteredData();
     }
 
     // View the employee turnstile movement details

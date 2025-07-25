@@ -3,7 +3,7 @@
 public partial class EmployeeMovementFilter
 {
     public string? Name { get; set; }
-    public DateTime? Date { get; set; }
+    public DateTime? Date { get; set; } = DateTime.Parse("2021-6-13");
     public string? Station { get; set; }
     public string? WorkCell { get; set; }
     public string? Department { get; set; }

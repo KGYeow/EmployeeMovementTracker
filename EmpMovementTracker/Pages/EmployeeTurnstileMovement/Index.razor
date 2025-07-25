@@ -173,8 +173,8 @@
     public DateOnly Date { get; set; }
 
     // Variable declaration & initialization
-    private bool isDataLoading = false;
-    private bool isTableLoading = false;
+    private bool isDataLoading = true;
+    private bool isTableLoading = true;
     private EmployeeMovementFilter filter = new();
     private EmployeeMovementFilterSelection filterOptions = new();
     private EmployeeTimeTracking employeeInfo = new();
@@ -186,7 +186,7 @@
         isDataLoading = true;
         try
         {
-            filter = new EmployeeMovementFilter { Date = Date.ToDateTime(TimeOnly.MinValue) };
+            filter = new() { Date = Date.ToDateTime(TimeOnly.MinValue) };
             filterOptions = await EmployeeMovementService.GetInitializedSelections();
             employeeInfo = await EmployeeTimeTrackingService.EmployeeInfo(PersonId, Date);
         }
@@ -221,7 +221,7 @@
     // Reset/clear the list filter
     private async Task ResetFilter()
     {
-        filter = new EmployeeMovementFilter { Date = Date.ToDateTime(TimeOnly.MinValue) };
+        filter = new() { Date = Date.ToDateTime(TimeOnly.MinValue) };
         await LoadFilteredData();
     }
 
