@@ -10,133 +10,132 @@
 
 @inject DashboardService DashboardService
 @inject EmployeeMovementService EmployeeMovementService
+@inject LayoutService LayoutService
 @inject ISnackbar Snackbar
 @inject NavigationManager Navigation
 
 <PageTitle>Dashboard - @AppConstant.AppTitle</PageTitle>
 
-<div class="dashboard-page-root">
-    <!-- Page Header-->
-    <PageHeader Title="Dashboard">
-        <RightHeaderContent>
-            <MudItem xs=12 sm="1" Class="d-flex justify-end align-center">
-                <MudToggleIconButton
-                    Variant="Variant.Outlined"
-                    ToggledVariant="Variant.Filled"
-                    Icon="@Icons.Material.Rounded.FilterList"
-                    ToggledIcon="@Icons.Material.Rounded.FilterListOff"
-                    Color="Color.Inherit"
-                    ToggledColor="Color.Primary"
-                    Size="Size.Small"
-                    DropShadow="false"
-                    @bind-Toggled="filterDrawerOpen"
-                />
-            </MudItem>
-        </RightHeaderContent>
-    </PageHeader>
+<!-- Page Header-->
+<PageHeader Title="Dashboard">
+    <RightHeaderContent>
+        <MudItem xs=12 sm="1" Class="d-flex justify-end align-center">
+            <MudToggleIconButton
+                Variant="Variant.Outlined"
+                ToggledVariant="Variant.Filled"
+                Icon="@Icons.Material.Rounded.FilterList"
+                ToggledIcon="@Icons.Material.Rounded.FilterListOff"
+                Color="Color.Inherit"
+                ToggledColor="Color.Primary"
+                Size="Size.Small"
+                DropShadow="false"
+                @bind-Toggled="filterDrawerOpen"
+            />
+        </MudItem>
+    </RightHeaderContent>
+</PageHeader>
 
-    <!-- Filter Side Panel -->
-    <MudDrawer Variant="DrawerVariant.Temporary" Anchor="Anchor.End" @bind-Open="@filterDrawerOpen">
-        <MudDrawerHeader>
-            <MudText Class="fw-bold" Typo="Typo.h6">Filters</MudText>
-        </MudDrawerHeader>
-        <MudContainer Class="flex-grow-1">
-            <EditForm class="d-flex flex-column h-100" FormName="DashboardFilterForm" Model="@filter" OnValidSubmit="ApplyFilter">
-                <div class="flex-grow-1">
-                    <MudGrid Spacing="2">
-                        <!-- Date Filter -->
-                        <MudItem xs="12">
-                            <MudInputLabel>Date</MudInputLabel>
-                            <MudDatePicker @bind-Date="filter.Date" DateFormat="dd/MM/yyyy" Variant="Variant.Outlined" Margin="Margin.Dense" ShowToolbar="false" IconSize="Size.Small" Style="font-size: 14px" />
-                        </MudItem>
-                        <!-- Building Filter -->
-                        <MudItem xs="12">
-                            <MudInputLabel>Building</MudInputLabel>
-                            <MudSelect @bind-Value="filter.BuildingId" Variant="Variant.Outlined" Margin="Margin.Dense" Typo="Typo.body2" Placeholder="Building" Dense>
-                                <MudSelectItem Value="String.Empty">All</MudSelectItem>
-                                @foreach (var buildingId in filterOptions.BuildingIds)
-                                {
-                                    <MudSelectItem Value="buildingId">@buildingId</MudSelectItem>
-                                }
-                            </MudSelect>
-                        </MudItem>
-                    </MudGrid>
-                </div>
-                <MudStack Row Class="py-3" Spacing="2" Justify="Justify.FlexEnd">
-                    <!-- Reset Button -->
-                    <MudButton Color="Color.Primary" title="Reset" OnClick="ResetFilter">
-                        Reset
-                    </MudButton>
-                    <!-- Apply Filter Button -->
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" DropShadow="false" title="Apply Filter">
-                        Apply
-                    </MudButton>
-                </MudStack>
-            </EditForm>
-        </MudContainer>
-    </MudDrawer>
+<!-- Filter Side Panel -->
+<MudDrawer Variant="DrawerVariant.Temporary" Anchor="Anchor.End" @bind-Open="@filterDrawerOpen">
+    <MudDrawerHeader>
+        <MudText Class="fw-bold" Typo="Typo.h6">Filters</MudText>
+    </MudDrawerHeader>
+    <MudContainer Class="flex-grow-1">
+        <EditForm class="d-flex flex-column h-100" FormName="DashboardFilterForm" Model="@filter" OnValidSubmit="ApplyFilter">
+            <div class="flex-grow-1">
+                <MudGrid Spacing="2">
+                    <!-- Date Filter -->
+                    <MudItem xs="12">
+                        <MudInputLabel>Date</MudInputLabel>
+                        <MudDatePicker @bind-Date="filter.Date" DateFormat="dd/MM/yyyy" Variant="Variant.Outlined" Margin="Margin.Dense" ShowToolbar="false" IconSize="Size.Small" Style="font-size: 14px" />
+                    </MudItem>
+                    <!-- Building Filter -->
+                    <MudItem xs="12">
+                        <MudInputLabel>Building</MudInputLabel>
+                        <MudSelect @bind-Value="filter.BuildingId" Variant="Variant.Outlined" Margin="Margin.Dense" Typo="Typo.body2" Placeholder="Building" Dense>
+                            <MudSelectItem Value="String.Empty">All</MudSelectItem>
+                            @foreach (var buildingId in filterOptions.BuildingIds)
+                            {
+                                <MudSelectItem Value="buildingId">@buildingId</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                </MudGrid>
+            </div>
+            <MudStack Row Class="py-3" Spacing="2" Justify="Justify.FlexEnd">
+                <!-- Reset Button -->
+                <MudButton Color="Color.Primary" title="Reset" OnClick="ResetFilter">
+                    Reset
+                </MudButton>
+                <!-- Apply Filter Button -->
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" DropShadow="false" title="Apply Filter">
+                    Apply
+                </MudButton>
+            </MudStack>
+        </EditForm>
+    </MudContainer>
+</MudDrawer>
 
-    @if (isPageLoading)
-    { <DashboardPageSkeleton /> }
-    else
-    {
-        <MudGrid>
-            <!-- Key Metrics Cards -->
-            <MudItem xs="12" sm="4">
-                <MudCard Elevation="25" Style="background: linear-gradient(40deg,rgb(0, 121, 107) 0%, rgb(128, 203, 196) 80%)">
-                    <MudCardContent Class="text-white">
-                        <MudText Typo="Typo.caption">Total Employee Present</MudText>
-                        <MudText Typo="Typo.h5" Class="fw-bold">@keyMetricsData.TotalEmployee</MudText>
-                    </MudCardContent>
-                </MudCard>
-            </MudItem>
-            <MudItem xs="12" sm="4">
-                <MudCard Elevation="25" Style="background: linear-gradient(40deg,rgb(0, 151, 167) 0%, rgb(128, 222, 234) 80%)">
-                    <MudCardContent Class="text-white">
-                        <MudText Typo="Typo.caption">Total Turnstile Access</MudText>
-                        <MudText Typo="Typo.h5" Class="fw-bold">@keyMetricsData.TotalTurnstileAccess</MudText>
-                    </MudCardContent>
-                </MudCard>
-            </MudItem>
-            <MudItem xs="12" sm="4">
-                <MudCard Elevation="25" Style="background: linear-gradient(45deg,rgb(194, 24, 91) 0%, rgb(244, 143, 177) 80%)">
-                    <MudCardContent Class="text-white">
-                        <MudText Typo="Typo.caption">Peak Hour</MudText>
-                        <MudText Typo="Typo.h5" Class="fw-bold">@keyMetricsData.PeakHour</MudText>
-                    </MudCardContent>
-                </MudCard>
-            </MudItem>
+@if (isPageLoading)
+{ <DashboardPageSkeleton /> }
+else
+{
+    <MudGrid>
+        <!-- Key Metrics Cards -->
+        <MudItem xs="12" sm="4">
+            <MudCard Elevation="25" Style="background: linear-gradient(40deg,rgb(0, 121, 107) 0%, rgb(128, 203, 196) 80%)">
+                <MudCardContent Class="text-white">
+                    <MudText Typo="Typo.caption">Total Employee Present</MudText>
+                    <MudText Typo="Typo.h5" Class="fw-bold">@keyMetricsData.TotalEmployee</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudCard Elevation="25" Style="background: linear-gradient(40deg,rgb(0, 151, 167) 0%, rgb(128, 222, 234) 80%)">
+                <MudCardContent Class="text-white">
+                    <MudText Typo="Typo.caption">Total Turnstile Access</MudText>
+                    <MudText Typo="Typo.h5" Class="fw-bold">@keyMetricsData.TotalTurnstileAccess</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudCard Elevation="25" Style="background: linear-gradient(45deg,rgb(194, 24, 91) 0%, rgb(244, 143, 177) 80%)">
+                <MudCardContent Class="text-white">
+                    <MudText Typo="Typo.caption">Peak Hour</MudText>
+                    <MudText Typo="Typo.h5" Class="fw-bold">@keyMetricsData.PeakHour</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
 
-            <!-- Daily Turnstile Activity Timeline Chart -->
-            <MudItem xs="12" sm="6">
-                <MudCard Elevation="25">
-                    <MudCardHeader Class="pb-0">
-                        <CardHeaderContent>
-                            <MudText Typo="Typo.body1" Class="fw-bold">Daily Turnstile Activity Timeline</MudText>
-                        </CardHeaderContent>
-                    </MudCardHeader>
-                    <MudCardContent>
-                        <TurnstileActivityTimeline TimelineData="turnstileActivityTimelineData" />
-                    </MudCardContent>
-                </MudCard>
-            </MudItem>
+        <!-- Daily Turnstile Activity Timeline Chart -->
+        <MudItem xs="12" sm="6">
+            <MudCard Elevation="25">
+                <MudCardHeader Class="pb-0">
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.body1" Class="fw-bold">Daily Turnstile Activity Timeline</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <TurnstileActivityTimeline TimelineData="turnstileActivityTimelineData" />
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
 
-            <!-- Daily Turnstile Movement by Building Chart -->
-            <MudItem xs="12" sm="6">
-                <MudCard Elevation="25">
-                    <MudCardHeader Class="pb-0">
-                        <CardHeaderContent>
-                            <MudText Typo="Typo.body1" Class="fw-bold">Daily Turnstile Movement by Building</MudText>
-                        </CardHeaderContent>
-                    </MudCardHeader>
-                    <MudCardContent>
-                        <TurnstileMovementBarChart ChartData="turnstileMovementEachBuildingData" />
-                    </MudCardContent>
-                </MudCard>
-            </MudItem>
-        </MudGrid>
-    }
-</div>
+        <!-- Daily Turnstile Movement by Building Chart -->
+        <MudItem xs="12" sm="6">
+            <MudCard Elevation="25">
+                <MudCardHeader Class="pb-0">
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.body1" Class="fw-bold">Daily Turnstile Movement by Building</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <TurnstileMovementBarChart ChartData="turnstileMovementEachBuildingData" />
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+}
 
 @code {
     // Variable declaration & initialization
@@ -145,8 +144,17 @@
     private DashboardFilter filter = new();
     private EmployeeMovementFilterSelection filterOptions = new();
     private DashboardKeyMetrics keyMetricsData = new();
-    private List<TimeSeriesChartSeries.TimeValue> turnstileActivityTimelineData = [];
-    private Dictionary<string, double> turnstileMovementEachBuildingData = [];
+    private List<TimeSeriesChartSeries.TimeValue> turnstileActivityTimelineData = new();
+    private Dictionary<string, double> turnstileMovementEachBuildingData = new();
+
+    protected override void OnParametersSet()
+    {
+        var BreadcrumbItems = new BreadcrumbItem[]
+        {
+          new ("Dashboard", href: null, disabled: true),
+        };
+        LayoutService.SetBreadcrumbs(BreadcrumbItems);
+    }
 
     // Action on component initialization
     protected override async Task OnInitializedAsync()

@@ -9,6 +9,7 @@
 
 @inject EmployeeMovementService EmployeeMovementService
 @inject EmployeeTimeTrackingService EmployeeTimeTrackingService
+@inject LayoutService LayoutService
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
 @inject NavigationManager Navigation
@@ -179,6 +180,16 @@
     private EmployeeMovementFilterSelection filterOptions = new();
     private EmployeeTimeTracking employeeInfo = new();
     private IEnumerable<EmployeeMovement> employeeMovements = [];
+
+    protected override void OnParametersSet()
+    {
+        var BreadcrumbItems = new BreadcrumbItem[]
+        {
+            new ("Daily Presence Times", "/dailyPresenceTimes"),
+            new ("Employee Turnstile Movement", href: null, disabled: true)
+        };
+        LayoutService.SetBreadcrumbs(BreadcrumbItems);
+    }
 
     // Action on component initialization
     protected override async Task OnInitializedAsync()

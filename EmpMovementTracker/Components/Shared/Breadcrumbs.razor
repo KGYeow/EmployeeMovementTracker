@@ -1,0 +1,26 @@
+﻿@inject NavigationManager Nav
+
+<MudBreadcrumbs Class="px-0 py-3" Items="items" Style="margin-top: -24px">
+    <SeparatorTemplate>
+        <MudIcon Icon="@Icons.Material.Rounded.KeyboardArrowRight" Style="font-size: 14px"/>
+    </SeparatorTemplate>
+    <ItemTemplate Context="item">
+        <MudLink Href="@item.Href">
+            <MudText Typo="Typo.body2">@item.Text</MudText>
+        </MudLink>
+    </ItemTemplate>
+</MudBreadcrumbs>
+
+@code {
+    // Variable declaration & initialization
+    private List<BreadcrumbItem> items = new();
+
+    // Action on component initialization
+    protected override void OnInitialized()
+    {
+        // Add Home as the first item
+        items.Add(new BreadcrumbItem("Dashboard", href: "#"));
+        items.Add(new BreadcrumbItem("Dashboard", href: "#"));
+        items.Add(new BreadcrumbItem("Dashboard", href: "#"));
+    }
+}

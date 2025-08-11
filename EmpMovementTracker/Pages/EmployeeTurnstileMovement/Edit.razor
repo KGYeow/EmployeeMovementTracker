@@ -8,6 +8,7 @@
 @using Microsoft.AspNetCore.WebUtilities
 
 @inject EmployeeMovementService EmployeeMovementService
+@inject LayoutService LayoutService
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
 @inject NavigationManager Navigation
@@ -161,6 +162,20 @@
     private EmployeeMovementFilterSelection filterOptions = new();
     private EmployeeMovementEdit editEmployeeMovement = new();
     private MudForm form = null!;
+
+    protected override void OnParametersSet()
+    {
+        var BreadcrumbItems = new BreadcrumbItem[]
+        {
+            new ("Daily Presence Times", "/dailyPresenceTimes"),
+            new ("Employee Turnstile Movement", QueryHelpers.AddQueryString($"/employeeTurnstileMovement/{PersonId}", new Dictionary<string, string?>
+            {
+                ["Date"] = Date.ToString("yyyy-MM-dd")
+            })),
+            new ("Edit Employee Turnstile Movement", href: null, disabled: true),
+        };
+        LayoutService.SetBreadcrumbs(BreadcrumbItems);
+    }
 
     // Action on component initialization
     protected override async Task OnInitializedAsync()

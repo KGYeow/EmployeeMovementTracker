@@ -26,6 +26,7 @@ builder.Services.AddMudServices(config =>
     config.SnackbarConfiguration.ShowTransitionDuration = 500;
     config.SnackbarConfiguration.MaximumOpacity = 90;
 });
+builder.Services.AddScoped<LayoutService>();
 builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<EmployeeMovementService>();
 builder.Services.AddScoped<EmployeeTimeTrackingService>();
